@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteBase /nexus/
+
+# Se o arquivo/diretório não existe, redireciona para index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Redireciona URLs sem o prefixo /nexus para incluí-lo
+RewriteCond %{REQUEST_URI} !^/nexus/
+RewriteRule ^(.*)$ /nexus/$1 [R=301,L]

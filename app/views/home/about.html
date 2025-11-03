@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sobre</title>
+  <!-- Tailwind (Play CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bootstrap 5 (CSS + JS) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Lucide Icons -->
+  <script defer src="https://unpkg.com/lucide@latest"></script>
+  <!-- AOS Library for Scroll Animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            nexus: {
+              ink: '#0c0f14',
+              base: '#f5f7fd',
+              a: '#4b687f',   // primária escura
+              b: '#63a8ca',   // destaque 1
+              c: '#85b0d8',   // destaque 2
+              d: '#af91bd',   // destaque 3
+              e: '#966e92',   // destaque 4
+              f: '#7c4c68'    // destaque 5
+            }
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(13, 18, 28, .12)',
+            glow: '0 0 0 4px rgba(99,168,202,.18)',
+            'glow-lg': '0 0 20px 8px rgba(99,168,202,.25)'
+          },
+          backdropBlur: {
+            xs: '2px'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root{
+      --nexus-a:#4b687f; --nexus-b:#63a8ca; --nexus-c:#85b0d8; --nexus-d:#af91bd; --nexus-e:#966e92; --nexus-f:#7c4c68;
+    }
+    .gradient-surface{ 
+      background-image: 
+        radial-gradient(1200px 600px at 10% -10%, rgba(99,168,202,.25), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(175,145,189,.22), transparent 60%),
+        linear-gradient(180deg, #fbfcff 0%, #f5f7fd 60%, #eef2f7 100%);
+    }
+    .gradient-hero {
+      background-image: 
+        radial-gradient(800px 800px at 20% 30%, rgba(99,168,202,.25), transparent 60%),
+        radial-gradient(600px 600px at 80% 70%, rgba(175,145,189,.22), transparent 60%),
+        linear-gradient(135deg, #fbfcff 0%, #f5f7fd 100%);
+    }
+    .glass{ backdrop-filter: blur(10px); background: rgba(255,255,255,.6); }
+    .frost{ backdrop-filter: blur(16px) saturate(130%); background: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.4); }
+    .brand-chip{ background: linear-gradient(135deg, var(--nexus-b), var(--nexus-d)); }
+    .brand-ring{ box-shadow: 0 0 0 8px rgba(133,176,216,.18); }
+    .star-spin{ animation: star 8s linear infinite; }
+    @keyframes star { from{ transform: rotate(0); } to{ transform: rotate(360deg);} }
+    .pulse-glow {
+      animation: pulse-glow 2s infinite;
+    }
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 0 0 0 rgba(99,168,202,0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(99,168,202,0); }
+      100% { box-shadow: 0 0 0 0 rgba(99,168,202,0); }
+    }
+    .nexus-card {
+      transition: all 0.3s ease;
+    }
+    .nexus-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(13, 18, 28, .15);
+    }
+    .nexus-gradient-text {
+      background: linear-gradient(135deg, var(--nexus-a), var(--nexus-f));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nexus-badge {
+      position: relative;
+      overflow: hidden;
+    }
+    .nexus-badge::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: 0.5s;
+    }
+    .nexus-badge:hover::before {
+      left: 100%;
+    }
+  </style>
+</head>
+<body class="bg-nexus-base text-nexus-ink gradient-surface">
+  <!-- Navbar -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-white/70 border-b border-white/60">
+    <nav class="container mx-auto flex items-center justify-between py-3 px-4">
+      <div class="flex items-center gap-3"> <!--link para about.html--
+        <!-- Logomarca -->
+        <div class="relative w-10 h-10 brand-ring rounded-2xl grid place-items-center">
+          <span class="w-6 h-6 inline-grid place-items-center rounded-xl star-spin" style="background:var(--nexus-f)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2l3.3 6.7L22 12l-6.7 3.3L12 22l-3.3-6.7L2 12l6.7-3.3L12 2z"/>
+            </svg>
+          </span>
+        </div>
+        <span class="text-xl font-extrabold tracking-tight" style="color:var(--nexus-a)">NEXUS</span>
+      </div>
+      <div class="hidden md:flex items-center gap-7 text-sm">
+        <a href="#justificativa" class="hover:opacity-80 transition-all">Porque?</a>
+        <a href="#escopo" class="hover:opacity-80 transition-all">Sistema</a>
+        <a href="#modulos" class="hover:opacity-80 transition-all">Módulos</a>
+        <a href="#destaques" class="hover:opacity-80 transition-all">Diferenciais</a>
+        <a href="#contato" class="hover:opacity-80 transition-all">Contato</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <button class="btn btn-sm btn-primary shadow-soft pulse-glow" 
+                style="--bs-btn-bg: var(--nexus-b); --bs-btn-border-color: var(--nexus-b); --bs-btn-hover-bg: var(--nexus-c);"
+                onclick="window.location.href='/nexus/login'">Acessar Sistema
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden gradient-hero">
+    <div class="absolute top-0 left-0 w-full h-full z-0 opacity-10">
+      <div class="absolute top-1/4 left-1/4 w-64 h-64 rounded-full" style="background: var(--nexus-b); filter: blur(60px);"></div>
+      <div class="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full" style="background: var(--nexus-d); filter: blur(60px);"></div>
+    </div>
+    <div class="container mx-auto px-4 pt-20 pb-16 grid md:grid-cols-2 items-center gap-12 relative z-10">
+      <div data-aos="fade-right" data-aos-duration="800">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs text-white brand-chip shadow-soft mb-5">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+          <span>Tecnologia inventiva</span>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-black leading-tight">
+          Revolucionando o <span class="nexus-gradient-text">transporte universitário</span> com tecnologia de ponta
+        </h1>
+        <p class="mt-5 text-lg text-slate-700/80 max-w-xl">
+          O <strong>NEXUS</strong> é uma plataforma web inovadora que substitui métodos informais por uma solução tecnológica robusta, transparente e eficiente para o gerenciamento de transporte universitário.
+        </p>
+        <div class="mt-7 flex flex-wrap gap-3">
+          <a href="#modulos" class="px-5 py-3 rounded-xl text-white shadow-soft transition-all hover:shadow-glow-lg" style="background:var(--nexus-a)">Explorar recursos</a>
+          <a href="#justificativa" class="px-5 py-3 rounded-xl border border-slate-300/60 bg-white/70 hover:bg-white transition">Por que criar?</a>
+        </div>
+      </div>
+      <div class="relative" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+        <!-- App Mockup 3D -->
+        <div class="relative rounded-3xl shadow-soft border border-white/70 glass p-5 transform perspective-1000 rotate-y-6">
+          <div class="rounded-2xl h-72 md:h-96 w-full bg-gradient-to-br from-nexus-b/40 via-white to-nexus-d/40 grid place-items-center overflow-hidden">
+            <div class="text-center p-6">
+              <div class="mx-auto w-16 h-16 rounded-2xl grid place-items-center pulse-glow" style="background:var(--nexus-a)">
+                <i data-lucide="qr-code" class="w-9 h-9 text-white"></i>
+              </div>
+              <p class="mt-4 font-semibold">Check-in por QR Code</p>
+              <p class="text-sm text-slate-600/80">Presença validada em segundos. Sem filas.</p>
+            </div>
+          </div>
+        </div>
+        <div class="absolute -right-6 -bottom-6 rounded-3xl p-4 text-white shadow-soft" style="background:linear-gradient(135deg,var(--nexus-f),var(--nexus-d))">
+          <p class="text-sm font-semibold">Automatização <span class="font-normal">de processos</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-12 bg-white/50">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="frost rounded-2xl p-6 shadow-soft" data-aos="fade-up" data-aos-delay="0">
+          <div class="text-3xl font-extrabold mb-2" style="color:var(--nexus-b)">99,9%</div>
+          <div class="text-sm opacity-70">Disponibilidade</div>
+        </div>
+        <div class="frost rounded-2xl p-6 shadow-soft" data-aos="fade-up" data-aos-delay="100">
+          <div class="text-3xl font-extrabold mb-2" style="color:var(--nexus-d)">-60%</div>
+          <div class="text-sm opacity-70">Tempo de gestão</div>
+        </div>
+        <div class="frost rounded-2xl p-6 shadow-soft" data-aos="fade-up" data-aos-delay="200">
+          <div class="text-3xl font-extrabold mb-2" style="color:var(--nexus-f)">+100%</div>
+          <div class="text-sm opacity-70">Transparência</div>
+        </div>
+        <div class="frost rounded-2xl p-6 shadow-soft" data-aos="fade-up" data-aos-delay="300">
+          <div class="text-3xl font-extrabold mb-2" style="color:var(--nexus-a)">24/7</div>
+          <div class="text-sm opacity-70">Acesso contínuo</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Justificativa -->
+  <section id="justificativa" class="py-20">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-black">Por que o NEXUS foi criado?</h2>
+        <p class="mt-3 text-slate-700/80 max-w-3xl mx-auto">Identificamos problemas críticos no sistema atual de transporte universitário e desenvolvemos soluções inovadoras para transformar completamente essa experiência.</p>
+      </div>
+      
+      <div class="grid lg:grid-cols-2 gap-10 items-center">
+        <div data-aos="fade-right">
+          <div class="frost rounded-2xl p-6 shadow-soft mb-6 nexus-card">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full grid place-items-center" style="background: rgba(124,76,104,0.15)">
+                <i data-lucide="triangle-alert" class="w-5 h-5" style="color:var(--nexus-f)"></i>
+              </div>
+              <h3 class="font-bold text-lg">Problemas Identificados</h3>
+            </div>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-2">
+                <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-f)"></i>
+                <span>Informalidade e ausência de controle sistemático</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-f)"></i>
+                <span>Esquecimentos e furadas de fila</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-f)"></i>
+                <span>Dificuldade em prever demanda real</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="x-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-f)"></i>
+                <span>Falta de transparência e de histórico confiável</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div data-aos="fade-left" data-aos-delay="200">
+          <div class="frost rounded-2xl p-6 shadow-soft nexus-card">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 rounded-full grid place-items-center" style="background: rgba(99,168,202,0.15)">
+                <i data-lucide="wand-2" class="w-5 h-5" style="color:var(--nexus-b)"></i>
+              </div>
+              <h3 class="font-bold text-lg">Soluções Propostas</h3>
+            </div>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-b)"></i>
+                <span>Inscrições ordenadas por <em>timestamp</em></span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-b)"></i>
+                <span>Controle rígido de vagas por veículo/horário</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-b)"></i>
+                <span>Transparência em tempo real para todos</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i data-lucide="check-circle" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-b)"></i>
+                <span>Histórico completo e análises de padrão de uso</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Escopo -->
+  <section id="escopo" class="py-20 bg-white/70 border-y border-white/60">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-black">Sistema</h2>
+        <p class="mt-3 text-slate-700/80 max-w-3xl mx-auto">Digitalizar reservas, controlar vagas em tempo real, garantir rastreabilidade e gerar relatórios que orientam decisões — tudo com foco em eficiência operacional.</p>
+      </div>
+      
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="text-center" data-aos="fade-up" data-aos-delay="0">
+          <div class="w-16 h-16 mx-auto rounded-2xl grid place-items-center mb-4" style="background:var(--nexus-a)">
+            <i data-lucide="target" class="w-8 h-8 text-white"></i>
+          </div>
+          <h3 class="font-bold text-lg mb-3">Objetivos</h3>
+          <ul class="text-sm space-y-2 text-slate-600">
+            <li>Processo 100% digital</li>
+            <li>Controle de vagas instantâneo</li>
+            <li>Relatórios e métricas detalhadas</li>
+            <li>Otimização de recursos</li>
+          </ul>
+        </div>
+        
+        <div class="text-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="w-16 h-16 mx-auto rounded-2xl grid place-items-center mb-4" style="background:var(--nexus-b)">
+            <i data-lucide="users" class="w-8 h-8 text-white"></i>
+          </div>
+          <h3 class="font-bold text-lg mb-3">Público-alvo</h3>
+          <ul class="text-sm space-y-2 text-slate-600">
+            <li>Estudantes universitários</li>
+            <li>Motoristas e operadores</li>
+            <li>Administradores</li>
+          </ul>
+        </div>
+        
+        <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="w-16 h-16 mx-auto rounded-2xl grid place-items-center mb-4" style="background:var(--nexus-d)">
+            <i data-lucide="bar-chart-3" class="w-8 h-8 text-white"></i>
+          </div>
+          <h3 class="font-bold text-lg mb-3">Resultados</h3>
+          <ul class="text-sm space-y-2 text-slate-600">
+            <li>Maior transparência</li>
+            <li>Redução de custos</li>
+            <li>Melhor experiência</li>
+            <li>Dados para decisões</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="mt-16 bg-gradient-to-r from-nexus-b/10 to-nexus-d/10 rounded-2xl p-6" data-aos="fade-up">
+        <h3 class="font-semibold text-center mb-4">Progresso de Implementação</h3>
+        <div class="grid md:grid-cols-3 gap-6 text-center">
+          <div>
+            <div class="text-2xl font-bold mb-1" style="color:var(--nexus-b)">85%</div>
+            <div class="text-sm text-slate-600">Módulo Estudante</div>
+            <div class="progress mt-2" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" style="height: 8px; background:#e7eef7">
+              <div class="progress-bar" style="width: 85%; background: var(--nexus-b);"></div>
+            </div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold mb-1" style="color:var(--nexus-d)">70%</div>
+            <div class="text-sm text-slate-600">Módulo Motorista</div>
+            <div class="progress mt-2" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="height: 8px; background:#e7eef7">
+              <div class="progress-bar" style="width: 70%; background: var(--nexus-d);"></div>
+            </div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold mb-1" style="color:var(--nexus-f)">60%</div>
+            <div class="text-sm text-slate-600">Módulo Admin</div>
+            <div class="progress mt-2" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="height: 8px; background:#e7eef7">
+              <div class="progress-bar" style="width: 60%; background: var(--nexus-f);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Módulos -->
+  <section id="modulos" class="py-20">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-black">Módulos do Sistema</h2>
+        <p class="mt-3 text-slate-700/80 max-w-3xl mx-auto">Uma arquitetura modular que atende estudantes, motoristas e administradores, com automações inteligentes e segurança desde o design.</p>
+      </div>
+      
+      <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Estudante -->
+        <div class="nexus-card frost rounded-2xl p-6 shadow-soft relative overflow-hidden" data-aos="fade-up" data-aos-delay="0">
+          <div class="absolute top-0 right-0 w-20 h-20 rounded-bl-full" style="background: linear-gradient(135deg, var(--nexus-b), transparent 70%); opacity: 0.1;"></div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl grid place-items-center" style="background:var(--nexus-b)">
+              <i data-lucide="graduation-cap" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="text-lg font-bold">Módulo Estudante</h3>
+          </div>
+          <ul class="space-y-3 text-sm">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-b)"></i>
+              <span>Cadastro e login acadêmico</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-b)"></i>
+              <span>Reserva por horário com limite de vagas</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-b)"></i>
+              <span>Cancelamento e histórico pessoal</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-b)"></i>
+              <span>QR Code para presença e carteirinha digital</span>
+            </li>
+          </ul>
+          <div class="mt-6 pt-4 border-t border-slate-200/50">
+            <a href="#" class="text-sm font-medium flex items-center gap-1" style="color:var(--nexus-b)">
+              Saiba mais <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Motorista -->
+        <div class="nexus-card frost rounded-2xl p-6 shadow-soft relative overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+          <div class="absolute top-0 right-0 w-20 h-20 rounded-bl-full" style="background: linear-gradient(135deg, var(--nexus-a), transparent 70%); opacity: 0.1;"></div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl grid place-items-center" style="background:var(--nexus-a)">
+              <i data-lucide="bus" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="text-lg font-bold">Módulo Motorista</h3>
+          </div>
+          <ul class="space-y-3 text-sm">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-a)"></i>
+              <span>Lista de passageiros por rota</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-a)"></i>
+              <span>Scanner de QR Code (check-in)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-a)"></i>
+              <span>Definição de rotas e relatórios diários</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-a)"></i>
+              <span>Comunicação com central</span>
+            </li>
+          </ul>
+          <div class="mt-6 pt-4 border-t border-slate-200/50">
+            <a href="#" class="text-sm font-medium flex items-center gap-1" style="color:var(--nexus-a)">
+              Saiba mais <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Admin -->
+        <div class="nexus-card frost rounded-2xl p-6 shadow-soft relative overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+          <div class="absolute top-0 right-0 w-20 h-20 rounded-bl-full" style="background: linear-gradient(135deg, var(--nexus-f), transparent 70%); opacity: 0.1;"></div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl grid place-items-center" style="background:var(--nexus-f)">
+              <i data-lucide="settings" class="w-6 h-6 text-white"></i>
+            </div>
+            <h3 class="text-lg font-bold">Módulo Administrador</h3>
+          </div>
+          <ul class="space-y-3 text-sm">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-f)"></i>
+              <span>Cadastro de veículos e capacidade</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-f)"></i>
+              <span>Limites por horário/rota e monitoramento</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-f)"></i>
+              <span>Relatórios e analytics avançados</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check" class="w-4 h-4 mt-0.5 flex-shrink-0" style="color:var(--nexus-f)"></i>
+              <span>Gestão de usuários e manutenção</span>
+            </li>
+          </ul>
+          <div class="mt-6 pt-4 border-t border-slate-200/50">
+            <a href="#" class="text-sm font-medium flex items-center gap-1" style="color:var(--nexus-f)">
+              Saiba mais <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Diferenciais -->
+  <section id="destaques" class="py-20 bg-white/70 border-y border-white/60">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-black">Diferenciais Tecnológicos</h2>
+        <p class="mt-3 text-slate-700/80 max-w-3xl mx-auto">Inventivo por padrão: automações, UX minimalista e visual de alto apelo garantem engajamento e confiança.</p>
+      </div>
+      
+      <div class="grid lg:grid-cols-2 gap-10 items-center">
+        <div>
+          <div class="grid sm:grid-cols-2 gap-6">
+            <div class="nexus-card frost rounded-2xl p-5 shadow-soft" data-aos="fade-up" data-aos-delay="0">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl grid place-items-center" style="background: rgba(75,104,127,0.15)">
+                  <i data-lucide="cpu" class="w-5 h-5" style="color:var(--nexus-a)"></i>
+                </div>
+                <h3 class="font-semibold">Otimização de ocupação</h3>
+              </div>
+              <p class="text-sm text-slate-600">Algoritmos inteligentes priorizam assentos e reduzem ociosidade, maximizando a eficiência dos veículos.</p>
+            </div>
+            
+            <div class="nexus-card frost rounded-2xl p-5 shadow-soft" data-aos="fade-up" data-aos-delay="100">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl grid place-items-center" style="background: rgba(99,168,202,0.15)">
+                  <i data-lucide="bell-ring" class="w-5 h-5" style="color:var(--nexus-b)"></i>
+                </div>
+                <h3 class="font-semibold">Notificações inteligentes</h3>
+              </div>
+              <p class="text-sm text-slate-600">Alertas de lotação, lembretes de embarque e comunicados importantes em tempo real.</p>
+            </div>
+            
+            <div class="nexus-card frost rounded-2xl p-5 shadow-soft" data-aos="fade-up" data-aos-delay="200">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl grid place-items-center" style="background: rgba(133,176,216,0.15)">
+                  <i data-lucide="scan-qr-code" class="w-5 h-5" style="color:var(--nexus-c)"></i>
+                </div>
+                <h3 class="font-semibold">QR Code antifraude</h3>
+              </div>
+              <p class="text-sm text-slate-600">Sistema de confirmação único por reserva, com validação de presença e controle antifraude.</p>
+            </div>
+            
+            <div class="nexus-card frost rounded-2xl p-5 shadow-soft" data-aos="fade-up" data-aos-delay="300">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-xl grid place-items-center" style="background: rgba(175,145,189,0.15)">
+                  <i data-lucide="bar-chart" class="w-5 h-5" style="color:var(--nexus-d)"></i>
+                </div>
+                <h3 class="font-semibold">Relatórios avançados</h3>
+              </div>
+              <p class="text-sm text-slate-600">Índices de assiduidade, estatísticas de ocupação e análise de demanda para planejamento.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="relative" data-aos="fade-left" data-aos-delay="400">
+          <div class="frost rounded-2xl p-6 shadow-soft">
+            <h3 class="font-bold text-lg mb-4">Lista de Espera Inteligente</h3>
+            <p class="text-sm text-slate-600 mb-4">Quando os horários estão esgotados, o sistema automaticamente coloca os estudantes em uma fila inteligente, com notificações imediatas sobre a liberação de vagas e priorização baseada em histórico e urgência.</p>
+            <div class="bg-slate-100/60 rounded-xl p-4 text-center">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs text-white" style="background:var(--nexus-f)">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                <span>Priorização inteligente</span>
+              </div>
+              <p class="text-xs mt-2 text-slate-600">Baseada em histórico de uso, frequência e urgência</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Final -->
+  <section id="contato" class="py-20 gradient-hero">
+    <div class="container mx-auto px-4 text-center">
+      <div class="max-w-2xl mx-auto" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-black mb-4">Pronto para transformar o transporte universitário?</h2>
+        <p class="text-lg text-slate-700/80 mb-8">O NEXUS não é apenas um sistema de transporte — é uma ponte entre a teoria acadêmica e a prática profissional, entre problemas cotidianos e soluções inovadoras.</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="#" class="px-6 py-3 rounded-xl text-white shadow-soft transition-all hover:shadow-glow-lg" style="background:var(--nexus-a)">Solicitar demonstração</a>
+          <a href="#" class="px-6 py-3 rounded-xl border border-slate-300/60 bg-white/70 hover:bg-white transition">Falar com equipe</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 bg-white/80 border-t border-white/60">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-xl grid place-items-center" style="background:var(--nexus-a)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2l3.3 6.7L22 12l-6.7 3.3L12 22l-3.3-6.7L2 12l6.7-3.3L12 2z"/>
+            </svg>
+          </div>
+          <span class="text-lg font-bold" style="color:var(--nexus-a)">NEXUS</span>
+        </div>
+        <!--
+        <div class="flex items-center gap-6 text-sm text-slate-600">
+          <a href="#" class="hover:opacity-80 transition">Privacidade</a>
+          <a href="#" class="hover:opacity-80 transition">Termos</a>
+          <a href="#" class="hover:opacity-80 transition">Suporte</a>
+        </div>
+        -->
+        <div class="text-sm text-slate-600">
+          © <span id="current-year"></span> NEXUS • Sistema de Transporte Universitário
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    // Initialize AOS (Animate On Scroll)
+    document.addEventListener('DOMContentLoaded', function() {
+      AOS.init({
+        duration: 800,
+        easing: 'ease-out-quad',
+        once: true,
+        offset: 50
+      });
+      
+      // Initialize Lucide Icons
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
