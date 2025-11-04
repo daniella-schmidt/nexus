@@ -303,7 +303,7 @@ if (!isset($_SESSION['user_id'])) {
         </a>
 
         <a href="/nexus/driver/definition/profile" class="nexus-card frost rounded-2xl p-6 text-center hover:shadow-glow-lg transition-all border border-white/40">
-          <i class="bi bi-user text-3xl text-nexus-e mb-3"></i>
+          <i class="bi bi-person-gear text-nexus-d text-3xl"></i>
           <p class="font-medium text-nexus-ink">Perfil</p>
         </a>
       </div>

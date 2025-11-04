@@ -1,382 +1,711 @@
--- =========================================
--- SISTEMA DE TRANSPORTE UNIVERSITÁRIO - NEXUS
--- Banco de dados MySQL - Versão Convertida
--- Versão: 2.1
--- =========================================
--- Criação do banco de dados
-CREATE DATABASE IF NOT EXISTS nexus
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Tempo de geração: 29/10/2025 às 00:18
+-- Versão do servidor: 10.4.32-MariaDB
+-- Versão do PHP: 8.2.12
 
-USE nexus;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- =========================================
--- TABELAS PRINCIPAIS
--- =========================================
 
--- 1. USERS - Dados dos usuários (estudantes, motoristas, admins)
-DROP TABLE IF EXISTS users;
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    matricula VARCHAR(20) UNIQUE NULL,
-    curso VARCHAR(50) NULL,
-    phone VARCHAR(15) NULL,
-    address VARCHAR(200) NULL,
-    emergency_contact VARCHAR(15) NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    user_type ENUM('student', 'driver', 'admin') NOT NULL,
-    profile_photo VARCHAR(255) NULL,
-    email_verified BOOLEAN DEFAULT FALSE,
-    active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    last_login TIMESTAMP NULL
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Banco de dados: `nexus`
+--
+CREATE DATABASE IF NOT EXISTS `nexus` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `nexus`;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `attendance`
+--
+
+CREATE TABLE `attendance` (
+  `id` int(11) NOT NULL,
+  `reservation_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `route_id` int(11) NOT NULL,
+  `attendance_date` date NOT NULL,
+  `status` enum('present','absent','cancelled','late','early') NOT NULL,
+  `check_in_time` timestamp NULL DEFAULT NULL,
+  `check_out_time` timestamp NULL DEFAULT NULL,
+  `notes` varchar(500) DEFAULT NULL,
+  `recorded_by` int(11) DEFAULT NULL,
+  `rating` int(11) DEFAULT NULL CHECK (`rating` >= 1 and `rating` <= 5),
+  `feedback` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 2. SCHEDULES - Turnos disponíveis (manhã, tarde, noite)
-DROP TABLE IF EXISTS schedules;
-CREATE TABLE schedules (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE,
-    departure_time TIME NOT NULL,
-    return_time TIME NOT NULL,
-    description VARCHAR(200) NULL,
-    max_capacity_multiplier DECIMAL(3,2) DEFAULT 1.0,
-    active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `maintenance_records`
+--
+
+CREATE TABLE `maintenance_records` (
+  `id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `maintenance_type` enum('preventive','corrective','inspection') NOT NULL,
+  `description` varchar(500) NOT NULL,
+  `cost` decimal(10,2) DEFAULT NULL,
+  `maintenance_date` date NOT NULL,
+  `next_maintenance_date` date DEFAULT NULL,
+  `technician` varchar(100) DEFAULT NULL,
+  `status` enum('scheduled','in_progress','completed','cancelled') DEFAULT 'completed',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 3. VEHICLES - Informações dos veículos
-DROP TABLE IF EXISTS vehicles;
-CREATE TABLE vehicles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    plate VARCHAR(10) NOT NULL UNIQUE,
-    model VARCHAR(50) NOT NULL,
-    brand VARCHAR(50) NOT NULL,
-    year INT NOT NULL,
-    capacity INT NOT NULL,
-    status ENUM('Ativo', 'Inativo', 'Em Manutenção') DEFAULT 'Ativo',
-    last_maintenance DATE NOT NULL,
-    notes TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `message` varchar(500) NOT NULL,
+  `type` enum('info','warning','success','reservation','cancellation','waiting_list','system') NOT NULL,
+  `priority` enum('low','medium','high','urgent') DEFAULT 'low',
+  `read_status` tinyint(1) DEFAULT 0,
+  `read_at` timestamp NULL DEFAULT NULL,
+  `action_url` varchar(200) DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4. SEATS - Layout visual dos assentos
-DROP TABLE IF EXISTS seats;
-CREATE TABLE seats (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_id INT NOT NULL,
-    seat_number VARCHAR(5) NOT NULL,
-    position_row INT NOT NULL,
-    position_column CHAR(1) NOT NULL,
-    seat_type ENUM('regular', 'priority', 'disabled') DEFAULT 'regular',
-    x_position INT NULL,
-    y_position INT NULL,
-    available BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
-    UNIQUE KEY UQ_VehicleSeat (vehicle_id, seat_number)
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `qr_codes`
+--
+
+CREATE TABLE `qr_codes` (
+  `id` int(11) NOT NULL,
+  `reservation_id` int(11) NOT NULL,
+  `code` varchar(100) NOT NULL,
+  `generated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `status` enum('active','used','expired','cancelled') DEFAULT 'active',
+  `scanned_by` int(11) DEFAULT NULL,
+  `scan_location` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5. ROUTES - Rotas e horários
-DROP TABLE IF EXISTS routes;
-CREATE TABLE routes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    origin VARCHAR(100) NULL,
-    destination VARCHAR(100) NOT NULL,
-    route_date DATE NOT NULL,
-    schedule_id INT NOT NULL,
-    departure_time TIME NOT NULL,
-    pickup_points TEXT NOT NULL,
-    max_capacity INT NOT NULL,
-    current_occupancy INT DEFAULT 0,
-    status ENUM('scheduled', 'in_progress', 'completed', 'cancelled') DEFAULT 'scheduled',
-    active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (schedule_id) REFERENCES schedules(id)
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `reservations`
+--
+
+CREATE TABLE `reservations` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `route_id` int(11) NOT NULL,
+  `seat_id` int(11) DEFAULT NULL,
+  `reservation_date` date NOT NULL,
+  `status` enum('active','cancelled','completed','waiting','no_show') NOT NULL DEFAULT 'active',
+  `qr_code` varchar(100) DEFAULT NULL,
+  `confirmation_code` varchar(10) DEFAULT NULL,
+  `confirmed_at` timestamp NULL DEFAULT NULL,
+  `check_in_time` timestamp NULL DEFAULT NULL,
+  `cancellation_reason` varchar(200) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 6. RESERVATIONS - Reservas ativas
-DROP TABLE IF EXISTS reservations;
-CREATE TABLE reservations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    route_id INT NOT NULL,
-    seat_id INT NULL,
-    reservation_date DATE NOT NULL,
-    start_date DATE NULL,
-    end_date DATE NULL,
-    days_of_week VARCHAR(50) NULL, -- Ex: 'mon,tue,wed,thu,fri'
-    pickup_point VARCHAR(100) NULL,
-    dropoff_point VARCHAR(100) NULL,
-    status ENUM('active', 'cancelled', 'completed', 'waiting', 'no_show') NOT NULL DEFAULT 'active',
-    qr_code VARCHAR(100) UNIQUE NULL,
-    confirmation_code VARCHAR(10) NULL,
-    confirmed_at TIMESTAMP NULL,
-    check_in_time TIMESTAMP NULL,
-    cancellation_reason VARCHAR(200) NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (route_id) REFERENCES routes(id),
-    FOREIGN KEY (seat_id) REFERENCES seats(id),
-    UNIQUE KEY UQ_UserRouteDate (user_id, route_id, reservation_date)
+--
+-- Despejando dados para a tabela `reservations`
+--
+
+INSERT INTO `reservations` (`id`, `user_id`, `route_id`, `seat_id`, `reservation_date`, `status`, `qr_code`, `confirmation_code`, `confirmed_at`, `check_in_time`, `cancellation_reason`, `created_at`, `updated_at`) VALUES
+(1, 2, 4, NULL, '2025-10-28', 'active', NULL, NULL, NULL, NULL, NULL, '2025-10-28 22:38:58', '2025-10-28 22:38:58'),
+(2, 3, 5, NULL, '2025-10-28', 'active', NULL, NULL, NULL, NULL, NULL, '2025-10-28 22:38:58', '2025-10-28 22:38:58');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `routes`
+--
+
+CREATE TABLE `routes` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `origin` varchar(100) DEFAULT NULL,
+  `destination` varchar(100) NOT NULL,
+  `route_date` date NOT NULL,
+  `schedule_id` int(11) NOT NULL,
+  `departure_time` time NOT NULL,
+  `pickup_points` text NOT NULL,
+  `max_capacity` int(11) NOT NULL,
+  `driver_id` int(11) DEFAULT NULL,
+  `current_occupancy` int(11) DEFAULT 0,
+  `status` enum('scheduled','in_progress','completed','cancelled') DEFAULT 'scheduled',
+  `active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `arrival_time` time DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `days_of_week` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 7. QR_CODES - Validação de presença
-DROP TABLE IF EXISTS qr_codes;
-CREATE TABLE qr_codes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    reservation_id INT NOT NULL,
-    code VARCHAR(100) UNIQUE NOT NULL,
-    generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    used_at TIMESTAMP NULL,
-    expires_at TIMESTAMP NULL,
-    status ENUM('active', 'used', 'expired', 'cancelled') DEFAULT 'active',
-    scanned_by INT NULL,
-    scan_location VARCHAR(100) NULL,
-    FOREIGN KEY (reservation_id) REFERENCES reservations(id),
-    FOREIGN KEY (scanned_by) REFERENCES users(id)
+--
+-- Despejando dados para a tabela `routes`
+--
+
+INSERT INTO `routes` (`id`, `name`, `origin`, `destination`, `route_date`, `schedule_id`, `departure_time`, `pickup_points`, `max_capacity`, `driver_id`, `current_occupancy`, `status`, `active`, `created_at`, `updated_at`, `arrival_time`, `description`, `days_of_week`) VALUES
+(4, 'danoca', 'unoesc', 'são sebastião', '2025-10-27', 1, '21:00:00', 'Pontos de parada não informados', 40, 5, 0, 'scheduled', 1, '2025-10-26 18:45:34', '2025-10-28 22:37:38', '22:20:00', 'ygfds', 'mon,tue,wed,thu,fri'),
+(5, 'Biologia', 'unoesc', 'são sebastião', '2025-10-27', 1, '12:30:00', 'Pontos de parada não informados', 40, 5, 0, 'scheduled', 1, '2025-10-27 17:57:25', '2025-10-28 22:37:38', '22:30:00', 'ygfds', 'mon,tue,fri,sun');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `schedules`
+--
+
+CREATE TABLE `schedules` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `departure_time` time NOT NULL,
+  `return_time` time NOT NULL,
+  `description` varchar(200) DEFAULT NULL,
+  `max_capacity_multiplier` decimal(3,2) DEFAULT 1.00,
+  `active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 8. WAITING_LIST - Fila de espera
-DROP TABLE IF EXISTS waiting_list;
-CREATE TABLE waiting_list (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    route_id INT NOT NULL,
-    position INT NOT NULL,
-    priority_score INT DEFAULT 0,
-    notification_sent BOOLEAN DEFAULT FALSE,
-    expires_at TIMESTAMP NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (route_id) REFERENCES routes(id),
-    UNIQUE KEY UQ_UserRouteWaiting (user_id, route_id)
+--
+-- Despejando dados para a tabela `schedules`
+--
+
+INSERT INTO `schedules` (`id`, `name`, `departure_time`, `return_time`, `description`, `max_capacity_multiplier`, `active`, `created_at`) VALUES
+(1, 'Manhã', '07:00:00', '12:00:00', 'Turno da manhã', 1.00, 1, '2025-10-26 18:03:33'),
+(2, 'Tarde', '13:00:00', '18:00:00', 'Turno da tarde', 1.00, 1, '2025-10-26 18:03:33'),
+(3, 'Noite', '19:00:00', '23:00:00', 'Turno da noite', 1.00, 1, '2025-10-26 18:03:33');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `seats`
+--
+
+CREATE TABLE `seats` (
+  `id` int(11) NOT NULL,
+  `vehicle_id` int(11) NOT NULL,
+  `seat_number` varchar(5) NOT NULL,
+  `position_row` int(11) NOT NULL,
+  `position_column` char(1) NOT NULL,
+  `seat_type` enum('regular','priority','disabled') DEFAULT 'regular',
+  `x_position` int(11) DEFAULT NULL,
+  `y_position` int(11) DEFAULT NULL,
+  `available` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 9. ATTENDANCE - Histórico de presença
-DROP TABLE IF EXISTS attendance;
-CREATE TABLE attendance (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    reservation_id INT NOT NULL,
-    user_id INT NOT NULL,
-    route_id INT NOT NULL,
-    attendance_date DATE NOT NULL,
-    status ENUM('present', 'absent', 'cancelled', 'late', 'early') NOT NULL,
-    check_in_time TIMESTAMP NULL,
-    check_out_time TIMESTAMP NULL,
-    notes VARCHAR(500) NULL,
-    recorded_by INT NULL,
-    rating INT NULL CHECK (rating >= 1 AND rating <= 5),
-    feedback VARCHAR(500) NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (reservation_id) REFERENCES reservations(id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (route_id) REFERENCES routes(id),
-    FOREIGN KEY (recorded_by) REFERENCES users(id)
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `system_logs`
+--
+
+CREATE TABLE `system_logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `action` varchar(100) NOT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `table_affected` varchar(50) DEFAULT NULL,
+  `record_id` int(11) DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(500) DEFAULT NULL,
+  `severity` enum('debug','info','warning','error','critical') DEFAULT 'info',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 10. NOTIFICATIONS - Avisos automáticos
-DROP TABLE IF EXISTS notifications;
-CREATE TABLE notifications (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    message VARCHAR(500) NOT NULL,
-    type ENUM('info', 'warning', 'success', 'reservation', 'cancellation', 'waiting_list', 'system') NOT NULL,
-    priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'low',
-    read_status BOOLEAN DEFAULT FALSE,
-    read_at TIMESTAMP NULL,
-    action_url VARCHAR(200) NULL,
-    expires_at TIMESTAMP NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `matricula` varchar(20) DEFAULT NULL,
+  `curso` varchar(50) DEFAULT NULL,
+  `phone` varchar(15) DEFAULT NULL,
+  `address` varchar(200) DEFAULT NULL,
+  `emergency_contact` varchar(15) DEFAULT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `user_type` enum('student','driver','admin') NOT NULL,
+  `profile_photo` varchar(255) DEFAULT NULL,
+  `email_verified` tinyint(1) DEFAULT 0,
+  `active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `last_login` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 11. SYSTEM_LOGS - Logs do sistema
-DROP TABLE IF EXISTS system_logs;
-CREATE TABLE system_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NULL,
-    action VARCHAR(100) NOT NULL,
-    description VARCHAR(500) NULL,
-    table_affected VARCHAR(50) NULL,
-    record_id INT NULL,
-    ip_address VARCHAR(45) NULL,
-    user_agent VARCHAR(500) NULL,
-    severity ENUM('debug', 'info', 'warning', 'error', 'critical') DEFAULT 'info',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+--
+-- Despejando dados para a tabela `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `matricula`, `curso`, `phone`, `address`, `emergency_contact`, `password_hash`, `user_type`, `profile_photo`, `email_verified`, `active`, `created_at`, `updated_at`, `last_login`) VALUES
+(1, 'Administrador', 'admin@nexus.com', NULL, NULL, NULL, NULL, NULL, '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NULL, 0, 1, '2025-10-26 18:03:33', '2025-10-27 23:04:33', '2025-10-27 23:04:33'),
+(2, 'Biologia', 'bchksdsbhsb@gmail.coms', '121212', 'Arquitetura e Urbanismo', '95658152656', 'sxdcfvgbhn, 123', NULL, '$2y$10$qOcp52v7Wf.5eUd1lzRmqOxIZx6sPkbiNKeqAz1ETwhyxY1mXfOiC', 'student', NULL, 0, 1, '2025-10-27 17:49:16', '2025-10-27 17:50:09', '2025-10-27 17:50:09'),
+(3, 'Biologia', 'admin@gmail.com', NULL, NULL, '95658152656', NULL, NULL, '$2y$10$anYuY695/P/jAucd9qtzB.ql04NBdPiLul31AKm0f6Ns0yxqFPaO.', 'admin', NULL, 1, 1, '2025-10-27 18:36:01', '2025-10-27 22:24:36', '2025-10-27 22:24:36'),
+(4, 'Biologia', 'bchksdsbhsb@gmail.com', '12345', 'Arquitetura e Urbanismo', '95658152656', 'sxdcfvgbhn, 123', NULL, '$2y$10$aVDhihtPzHHGggy7MIfEcedF6VrAnqYDsnbAHGpHbMlsyw/F4F3Fq', 'student', NULL, 0, 1, '2025-10-27 22:32:19', '2025-10-28 22:50:18', '2025-10-28 22:50:18'),
+(5, 'jose pereira', 'jose123@gmail.com', NULL, NULL, NULL, NULL, NULL, '$2y$10$8YsMqgChVim5p/rQZ7pFN.MBb6DfzmyEaZ.HW.b2dzIaKumvNb51.', 'driver', NULL, 0, 1, '2025-10-27 22:37:33', '2025-10-28 22:24:53', '2025-10-28 22:24:53');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `vehicles`
+--
+
+CREATE TABLE `vehicles` (
+  `id` int(11) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `plate` varchar(10) NOT NULL,
+  `model` varchar(50) NOT NULL,
+  `brand` varchar(50) NOT NULL,
+  `year` int(11) NOT NULL,
+  `capacity` int(11) NOT NULL,
+  `driver_id` int(11) DEFAULT NULL,
+  `mileage` int(11) DEFAULT 0,
+  `fuel_type` varchar(20) DEFAULT NULL,
+  `status` enum('Ativo','Inativo','Em Manutenção') DEFAULT 'Ativo',
+  `last_maintenance` date NOT NULL,
+  `next_maintenance` date DEFAULT NULL,
+  `chassis_number` varchar(17) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 12. MAINTENANCE_RECORDS - Registros de manutenção
-DROP TABLE IF EXISTS maintenance_records;
-CREATE TABLE maintenance_records (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_id INT NOT NULL,
-    maintenance_type ENUM('preventive', 'corrective', 'inspection') NOT NULL,
-    description VARCHAR(500) NOT NULL,
-    cost DECIMAL(10,2) NULL,
-    maintenance_date DATE NOT NULL,
-    next_maintenance_date DATE NULL,
-    technician VARCHAR(100) NULL,
-    status ENUM('scheduled', 'in_progress', 'completed', 'cancelled') DEFAULT 'completed',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
+--
+-- Despejando dados para a tabela `vehicles`
+--
+
+INSERT INTO `vehicles` (`id`, `type`, `plate`, `model`, `brand`, `year`, `capacity`, `driver_id`, `mileage`, `fuel_type`, `status`, `last_maintenance`, `next_maintenance`, `chassis_number`, `notes`, `active`, `created_at`, `updated_at`) VALUES
+(1, 'Van', 'LLL1234', 'asdfg', 'asdfcghj', 2011, 40, 5, 121212, 'Diesel', 'Ativo', '2025-02-25', '2027-02-25', '9BWZZZ377VT004251', '', 1, '2025-10-27 18:07:26', '2025-10-28 22:36:30');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura stand-in para view `v_active_reservations`
+-- (Veja abaixo para a visão atual)
+--
+CREATE TABLE `v_active_reservations` (
+`id` int(11)
+,`student_name` varchar(100)
+,`email` varchar(100)
+,`matricula` varchar(20)
+,`curso` varchar(50)
+,`phone` varchar(15)
+,`route_name` varchar(100)
+,`origin` varchar(100)
+,`destination` varchar(100)
+,`schedule_name` varchar(50)
+,`departure_time` time
+,`return_time` time
+,`seat_number` varchar(5)
+,`reservation_date` date
+,`status` enum('active','cancelled','completed','waiting','no_show')
+,`confirmation_code` varchar(10)
+,`created_at` timestamp
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura stand-in para view `v_admin_dashboard`
+-- (Veja abaixo para a visão atual)
+--
+CREATE TABLE `v_admin_dashboard` (
+`total_students` bigint(21)
+,`total_drivers` bigint(21)
+,`total_vehicles` bigint(21)
+,`today_routes` bigint(21)
+,`today_reservations` bigint(21)
+,`today_cancellations` bigint(21)
+,`avg_occupancy_week` decimal(21,8)
+,`pending_maintenance` bigint(21)
+,`unread_notifications_today` bigint(21)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura stand-in para view `v_attendance_stats`
+-- (Veja abaixo para a visão atual)
+--
+CREATE TABLE `v_attendance_stats` (
+`user_id` int(11)
+,`name` varchar(100)
+,`matricula` varchar(20)
+,`curso` varchar(50)
+,`total_reservations` bigint(21)
+,`present_count` decimal(22,0)
+,`absent_count` decimal(22,0)
+,`late_count` decimal(22,0)
+,`cancelled_count` decimal(22,0)
+,`attendance_percentage` decimal(5,2)
+,`average_rating` decimal(7,6)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura stand-in para view `v_route_occupancy`
+-- (Veja abaixo para a visão atual)
+--
+CREATE TABLE `v_route_occupancy` (
+`route_id` int(11)
+,`route_name` varchar(100)
+,`origin` varchar(100)
+,`destination` varchar(100)
+,`route_date` date
+,`schedule_name` varchar(50)
+,`departure_time` time
+,`vehicle_plate` varchar(10)
+,`vehicle_model` varchar(50)
+,`max_capacity` int(11)
+,`current_occupancy` int(11)
+,`occupancy_percentage` decimal(5,2)
+,`available_seats` bigint(12)
+,`status` enum('scheduled','in_progress','completed','cancelled')
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `waiting_list`
+--
+
+CREATE TABLE `waiting_list` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `route_id` int(11) NOT NULL,
+  `position` int(11) NOT NULL,
+  `priority_score` int(11) DEFAULT 0,
+  `notification_sent` tinyint(1) DEFAULT 0,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- =========================================
--- ÍNDICES PARA PERFORMANCE
--- =========================================
+-- --------------------------------------------------------
 
--- Índices para users
-CREATE INDEX IX_users_email ON users(email);
-CREATE INDEX IX_users_matricula ON users(matricula);
-CREATE INDEX IX_users_type ON users(user_type);
-CREATE INDEX IX_users_active ON users(active);
+--
+-- Estrutura para view `v_active_reservations`
+--
+DROP TABLE IF EXISTS `v_active_reservations`;
 
--- Índices para routes
-CREATE INDEX IX_routes_date ON routes(route_date);
-CREATE INDEX IX_routes_schedule ON routes(schedule_id);
-CREATE INDEX IX_routes_status ON routes(status);
-CREATE INDEX IX_routes_active ON routes(active);
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_active_reservations`  AS SELECT `r`.`id` AS `id`, `u`.`name` AS `student_name`, `u`.`email` AS `email`, `u`.`matricula` AS `matricula`, `u`.`curso` AS `curso`, `u`.`phone` AS `phone`, `rt`.`name` AS `route_name`, `rt`.`origin` AS `origin`, `rt`.`destination` AS `destination`, `s`.`name` AS `schedule_name`, `s`.`departure_time` AS `departure_time`, `s`.`return_time` AS `return_time`, `st`.`seat_number` AS `seat_number`, `r`.`reservation_date` AS `reservation_date`, `r`.`status` AS `status`, `r`.`confirmation_code` AS `confirmation_code`, `r`.`created_at` AS `created_at` FROM ((((`reservations` `r` join `users` `u` on(`r`.`user_id` = `u`.`id`)) join `routes` `rt` on(`r`.`route_id` = `rt`.`id`)) join `schedules` `s` on(`rt`.`schedule_id` = `s`.`id`)) left join `seats` `st` on(`r`.`seat_id` = `st`.`id`)) WHERE `r`.`status` in ('active','waiting') AND `rt`.`active` = 1 AND `u`.`active` = 1 ;
 
--- Índices para reservations
-CREATE INDEX IX_reservations_user ON reservations(user_id);
-CREATE INDEX IX_reservations_route ON reservations(route_id);
-CREATE INDEX IX_reservations_date ON reservations(reservation_date);
-CREATE INDEX IX_reservations_status ON reservations(status);
-CREATE INDEX IX_reservations_qr_code ON reservations(qr_code);
+-- --------------------------------------------------------
 
--- Índices para attendance
-CREATE INDEX IX_attendance_date ON attendance(attendance_date);
-CREATE INDEX IX_attendance_user ON attendance(user_id);
-CREATE INDEX IX_attendance_status ON attendance(status);
+--
+-- Estrutura para view `v_admin_dashboard`
+--
+DROP TABLE IF EXISTS `v_admin_dashboard`;
 
--- Índices para notifications
-CREATE INDEX IX_notifications_user_read ON notifications(user_id, read_status);
-CREATE INDEX IX_notifications_created ON notifications(created_at);
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_admin_dashboard`  AS SELECT (select count(0) from `users` where `users`.`user_type` = 'student' and `users`.`active` = 1) AS `total_students`, (select count(0) from `users` where `users`.`user_type` = 'driver' and `users`.`active` = 1) AS `total_drivers`, (select count(0) from `vehicles` where `vehicles`.`status` = 'Ativo') AS `total_vehicles`, (select count(0) from `routes` where `routes`.`route_date` = curdate() and `routes`.`active` = 1) AS `today_routes`, (select count(0) from `reservations` where `reservations`.`reservation_date` = curdate() and `reservations`.`status` = 'active') AS `today_reservations`, (select count(0) from `reservations` where `reservations`.`reservation_date` = curdate() and `reservations`.`status` = 'cancelled') AS `today_cancellations`, (select avg(cast(`routes`.`current_occupancy` as decimal(10,0)) / cast(`routes`.`max_capacity` as decimal(10,0)) * 100) from `routes` where `routes`.`route_date` >= curdate() - interval 7 day and `routes`.`active` = 1) AS `avg_occupancy_week`, (select count(0) from `maintenance_records` where `maintenance_records`.`status` in ('scheduled','in_progress')) AS `pending_maintenance`, (select count(0) from `notifications` where `notifications`.`read_status` = 0 and `notifications`.`created_at` >= current_timestamp() - interval 1 day) AS `unread_notifications_today` ;
 
--- Índices para waiting_list
-CREATE INDEX IX_waiting_list_route ON waiting_list(route_id);
-CREATE INDEX IX_waiting_list_position ON waiting_list(route_id, position);
+-- --------------------------------------------------------
 
--- =========================================
--- VIEWS ÚTEIS PARA RELATÓRIOS
--- =========================================
+--
+-- Estrutura para view `v_attendance_stats`
+--
+DROP TABLE IF EXISTS `v_attendance_stats`;
 
--- View para reservas ativas com detalhes
-DROP VIEW IF EXISTS v_active_reservations;
-CREATE VIEW v_active_reservations AS
-SELECT 
-    r.id,
-    u.name AS student_name,
-    u.email,
-    u.matricula,
-    u.curso,
-    u.phone,
-    rt.name AS route_name,
-    rt.origin,
-    rt.destination,
-    s.name AS schedule_name,
-    s.departure_time,
-    s.return_time,
-    st.seat_number,
-    r.reservation_date,
-    r.status,
-    r.confirmation_code,
-    r.created_at
-FROM reservations r
-JOIN users u ON r.user_id = u.id
-JOIN routes rt ON r.route_id = rt.id
-JOIN schedules s ON rt.schedule_id = s.id
-LEFT JOIN seats st ON r.seat_id = st.id
-WHERE r.status IN ('active', 'waiting')
-  AND rt.active = TRUE
-  AND u.active = TRUE;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_attendance_stats`  AS SELECT `u`.`id` AS `user_id`, `u`.`name` AS `name`, `u`.`matricula` AS `matricula`, `u`.`curso` AS `curso`, count(0) AS `total_reservations`, sum(case when `a`.`status` = 'present' then 1 else 0 end) AS `present_count`, sum(case when `a`.`status` = 'absent' then 1 else 0 end) AS `absent_count`, sum(case when `a`.`status` = 'late' then 1 else 0 end) AS `late_count`, sum(case when `a`.`status` = 'cancelled' then 1 else 0 end) AS `cancelled_count`, cast(sum(case when `a`.`status` = 'present' then 1 else 0 end) * 100.0 / nullif(count(0),0) as decimal(5,2)) AS `attendance_percentage`, avg(cast(`a`.`rating` as decimal(3,2))) AS `average_rating` FROM ((`users` `u` join `reservations` `r` on(`u`.`id` = `r`.`user_id`)) join `attendance` `a` on(`r`.`id` = `a`.`reservation_id`)) WHERE `u`.`user_type` = 'student' GROUP BY `u`.`id`, `u`.`name`, `u`.`matricula`, `u`.`curso` ;
 
--- View para estatísticas de presença
-DROP VIEW IF EXISTS v_attendance_stats;
-CREATE VIEW v_attendance_stats AS
-SELECT 
-    u.id AS user_id,
-    u.name,
-    u.matricula,
-    u.curso,
-    COUNT(*) AS total_reservations,
-    SUM(CASE WHEN a.status = 'present' THEN 1 ELSE 0 END) AS present_count,
-    SUM(CASE WHEN a.status = 'absent' THEN 1 ELSE 0 END) AS absent_count,
-    SUM(CASE WHEN a.status = 'late' THEN 1 ELSE 0 END) AS late_count,
-    SUM(CASE WHEN a.status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_count,
-    CAST(
-        (SUM(CASE WHEN a.status = 'present' THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0))
-        AS DECIMAL(5,2)
-    ) AS attendance_percentage,
-    AVG(CAST(a.rating AS DECIMAL(3,2))) AS average_rating
-FROM users u
-JOIN reservations r ON u.id = r.user_id
-JOIN attendance a ON r.id = a.reservation_id
-WHERE u.user_type = 'student'
-GROUP BY u.id, u.name, u.matricula, u.curso;
+-- --------------------------------------------------------
 
--- View para ocupação de rotas
-DROP VIEW IF EXISTS v_route_occupancy;
-CREATE VIEW v_route_occupancy AS
-SELECT 
-    r.id AS route_id,
-    r.name AS route_name,
-    r.origin,
-    r.destination,
-    r.route_date,
-    s.name AS schedule_name,
-    s.departure_time,
-    v.plate AS vehicle_plate,
-    v.model AS vehicle_model,
-    v.capacity AS max_capacity,
-    r.current_occupancy,
-    CAST((r.current_occupancy * 100.0 / v.capacity) AS DECIMAL(5,2)) AS occupancy_percentage,
-    (v.capacity - r.current_occupancy) AS available_seats,
-    r.status
-FROM routes r
-JOIN schedules s ON r.schedule_id = s.id
-LEFT JOIN vehicles v ON r.id = v.id
-WHERE r.route_date >= CURDATE()
-AND r.status IN ('scheduled', 'in_progress')
-AND r.active = TRUE;
+--
+-- Estrutura para view `v_route_occupancy`
+--
+DROP TABLE IF EXISTS `v_route_occupancy`;
 
--- View para dashboard administrativo
-DROP VIEW IF EXISTS v_admin_dashboard;
-CREATE VIEW v_admin_dashboard AS
-SELECT 
-    (SELECT COUNT(*) FROM users WHERE user_type = 'student' AND active = TRUE) AS total_students,
-    (SELECT COUNT(*) FROM users WHERE user_type = 'driver' AND active = TRUE) AS total_drivers,
-    (SELECT COUNT(*) FROM vehicles WHERE status = 'Ativo') AS total_vehicles,
-    (SELECT COUNT(*) FROM routes WHERE route_date = CURDATE() AND active = TRUE) AS today_routes,
-    (SELECT COUNT(*) FROM reservations WHERE reservation_date = CURDATE() AND status = 'active') AS today_reservations,
-    (SELECT COUNT(*) FROM reservations WHERE reservation_date = CURDATE() AND status = 'cancelled') AS today_cancellations,
-    (SELECT AVG(CAST(current_occupancy AS DECIMAL) / CAST(max_capacity AS DECIMAL) * 100) 
-     FROM routes 
-     WHERE route_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) AND active = TRUE) AS avg_occupancy_week,
-    (SELECT COUNT(*) FROM maintenance_records WHERE status IN ('scheduled', 'in_progress')) AS pending_maintenance,
-    (SELECT COUNT(*) FROM notifications WHERE read_status = FALSE AND created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)) AS unread_notifications_today;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_route_occupancy`  AS SELECT `r`.`id` AS `route_id`, `r`.`name` AS `route_name`, `r`.`origin` AS `origin`, `r`.`destination` AS `destination`, `r`.`route_date` AS `route_date`, `s`.`name` AS `schedule_name`, `s`.`departure_time` AS `departure_time`, `v`.`plate` AS `vehicle_plate`, `v`.`model` AS `vehicle_model`, `v`.`capacity` AS `max_capacity`, `r`.`current_occupancy` AS `current_occupancy`, cast(`r`.`current_occupancy` * 100.0 / `v`.`capacity` as decimal(5,2)) AS `occupancy_percentage`, `v`.`capacity`- `r`.`current_occupancy` AS `available_seats`, `r`.`status` AS `status` FROM ((`routes` `r` join `schedules` `s` on(`r`.`schedule_id` = `s`.`id`)) left join `vehicles` `v` on(`r`.`id` = `v`.`id`)) WHERE `r`.`route_date` >= curdate() AND `r`.`status` in ('scheduled','in_progress') AND `r`.`active` = 1 ;
 
--- =========================================
--- INSERÇÃO DE DADOS INICIAIS
--- =========================================
+--
+-- Índices para tabelas despejadas
+--
 
--- Inserir schedules (turnos)
-INSERT INTO schedules (name, departure_time, return_time, description) VALUES
-('Manhã', '07:00', '12:00', 'Turno da manhã'),
-('Tarde', '13:00', '18:00', 'Turno da tarde'),
-('Noite', '19:00', '23:00', 'Turno da noite');
+--
+-- Índices de tabela `attendance`
+--
+ALTER TABLE `attendance`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `reservation_id` (`reservation_id`),
+  ADD KEY `route_id` (`route_id`),
+  ADD KEY `recorded_by` (`recorded_by`),
+  ADD KEY `IX_attendance_date` (`attendance_date`),
+  ADD KEY `IX_attendance_user` (`user_id`),
+  ADD KEY `IX_attendance_status` (`status`);
 
--- Inserir usuário admin padrão
-INSERT INTO users (name, email, password_hash, user_type) VALUES
-('Administrador', 'admin@nexus.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+--
+-- Índices de tabela `maintenance_records`
+--
+ALTER TABLE `maintenance_records`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `vehicle_id` (`vehicle_id`);
+
+--
+-- Índices de tabela `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IX_notifications_user_read` (`user_id`,`read_status`),
+  ADD KEY `IX_notifications_created` (`created_at`);
+
+--
+-- Índices de tabela `qr_codes`
+--
+ALTER TABLE `qr_codes`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`),
+  ADD KEY `reservation_id` (`reservation_id`),
+  ADD KEY `scanned_by` (`scanned_by`);
+
+--
+-- Índices de tabela `reservations`
+--
+ALTER TABLE `reservations`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UQ_UserRouteDate` (`user_id`,`route_id`,`reservation_date`),
+  ADD UNIQUE KEY `qr_code` (`qr_code`),
+  ADD KEY `seat_id` (`seat_id`),
+  ADD KEY `IX_reservations_user` (`user_id`),
+  ADD KEY `IX_reservations_route` (`route_id`),
+  ADD KEY `IX_reservations_date` (`reservation_date`),
+  ADD KEY `IX_reservations_status` (`status`),
+  ADD KEY `IX_reservations_qr_code` (`qr_code`);
+
+--
+-- Índices de tabela `routes`
+--
+ALTER TABLE `routes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `IX_routes_date` (`route_date`),
+  ADD KEY `IX_routes_schedule` (`schedule_id`),
+  ADD KEY `IX_routes_status` (`status`),
+  ADD KEY `IX_routes_active` (`active`),
+  ADD KEY `driver_id` (`driver_id`);
+
+--
+-- Índices de tabela `schedules`
+--
+ALTER TABLE `schedules`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Índices de tabela `seats`
+--
+ALTER TABLE `seats`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UQ_VehicleSeat` (`vehicle_id`,`seat_number`);
+
+--
+-- Índices de tabela `system_logs`
+--
+ALTER TABLE `system_logs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Índices de tabela `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD UNIQUE KEY `matricula` (`matricula`),
+  ADD KEY `IX_users_email` (`email`),
+  ADD KEY `IX_users_matricula` (`matricula`),
+  ADD KEY `IX_users_type` (`user_type`),
+  ADD KEY `IX_users_active` (`active`);
+
+--
+-- Índices de tabela `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `plate` (`plate`),
+  ADD KEY `driver_id` (`driver_id`);
+
+--
+-- Índices de tabela `waiting_list`
+--
+ALTER TABLE `waiting_list`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `UQ_UserRouteWaiting` (`user_id`,`route_id`),
+  ADD KEY `IX_waiting_list_route` (`route_id`),
+  ADD KEY `IX_waiting_list_position` (`route_id`,`position`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `attendance`
+--
+ALTER TABLE `attendance`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `maintenance_records`
+--
+ALTER TABLE `maintenance_records`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `qr_codes`
+--
+ALTER TABLE `qr_codes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `reservations`
+--
+ALTER TABLE `reservations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `routes`
+--
+ALTER TABLE `routes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de tabela `schedules`
+--
+ALTER TABLE `schedules`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de tabela `seats`
+--
+ALTER TABLE `seats`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `system_logs`
+--
+ALTER TABLE `system_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de tabela `vehicles`
+--
+ALTER TABLE `vehicles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de tabela `waiting_list`
+--
+ALTER TABLE `waiting_list`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restrições para tabelas despejadas
+--
+
+--
+-- Restrições para tabelas `attendance`
+--
+ALTER TABLE `attendance`
+  ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`reservation_id`) REFERENCES `reservations` (`id`),
+  ADD CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `attendance_ibfk_3` FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`),
+  ADD CONSTRAINT `attendance_ibfk_4` FOREIGN KEY (`recorded_by`) REFERENCES `users` (`id`);
+
+--
+-- Restrições para tabelas `maintenance_records`
+--
+ALTER TABLE `maintenance_records`
+  ADD CONSTRAINT `maintenance_records_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`);
+
+--
+-- Restrições para tabelas `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Restrições para tabelas `qr_codes`
+--
+ALTER TABLE `qr_codes`
+  ADD CONSTRAINT `qr_codes_ibfk_1` FOREIGN KEY (`reservation_id`) REFERENCES `reservations` (`id`),
+  ADD CONSTRAINT `qr_codes_ibfk_2` FOREIGN KEY (`scanned_by`) REFERENCES `users` (`id`);
+
+--
+-- Restrições para tabelas `reservations`
+--
+ALTER TABLE `reservations`
+  ADD CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `reservations_ibfk_2` FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`),
+  ADD CONSTRAINT `reservations_ibfk_3` FOREIGN KEY (`seat_id`) REFERENCES `seats` (`id`);
+
+--
+-- Restrições para tabelas `routes`
+--
+ALTER TABLE `routes`
+  ADD CONSTRAINT `routes_ibfk_1` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`),
+  ADD CONSTRAINT `routes_ibfk_2` FOREIGN KEY (`driver_id`) REFERENCES `users` (`id`);
+
+--
+-- Restrições para tabelas `seats`
+--
+ALTER TABLE `seats`
+  ADD CONSTRAINT `seats_ibfk_1` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `system_logs`
+--
+ALTER TABLE `system_logs`
+  ADD CONSTRAINT `system_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Restrições para tabelas `vehicles`
+--
+ALTER TABLE `vehicles`
+  ADD CONSTRAINT `vehicles_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `users` (`id`);
+
+--
+-- Restrições para tabelas `waiting_list`
+--
+ALTER TABLE `waiting_list`
+  ADD CONSTRAINT `waiting_list_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `waiting_list_ibfk_2` FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

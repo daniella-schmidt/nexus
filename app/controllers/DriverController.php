@@ -214,6 +214,12 @@ class DriverController extends BaseController {
         $userId = $this->session->get('user_id');
         $user = $this->userRepo->findById($userId);
 
+        if (!$user) {
+            $this->session->set('error', 'Usuário não encontrado');
+            $this->redirect('/driver/dashboard');
+            return;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userData = [
                 'name' => $_POST['name'] ?? '',
@@ -223,6 +229,35 @@ class DriverController extends BaseController {
                 'emergency_contact' => $_POST['emergency_contact'] ?? ''
             ];
 
+            // Handle profile photo upload
+            if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
+                $file = $_FILES['profile_photo'];
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                $maxSize = 2 * 1024 * 1024; // 2MB
+
+                if (in_array($file['type'], $allowedTypes) && $file['size'] <= $maxSize) {
+                    $uploadDir = __DIR__ . '/../../public/uploads/profile_photos/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0755, true);
+                    }
+
+                    $fileName = 'pf_' . uniqid() . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
+                    $filePath = $uploadDir . $fileName;
+
+                    if (move_uploaded_file($file['tmp_name'], $filePath)) {
+                        $userData['profile_photo'] = '/uploads/profile_photos/' . $fileName;
+                    } else {
+                        $this->session->set('error', 'Erro ao salvar foto de perfil');
+                        $this->redirect('/driver/definition/profile');
+                        return;
+                    }
+                } else {
+                    $this->session->set('error', 'Tipo de arquivo inválido ou tamanho excedido (máx. 2MB)');
+                    $this->redirect('/driver/definition/profile');
+                    return;
+                }
+            }
+
             // Verificar se senha foi fornecida para alteração
             if (!empty($_POST['password'])) {
                 $userData['password'] = $_POST['password'];
@@ -230,14 +265,30 @@ class DriverController extends BaseController {
 
             if ($this->userRepo->updateUser($userId, $userData)) {
                 $this->session->set('success', 'Perfil atualizado com sucesso!');
-                $this->redirect('/driver/profile');
+                $this->redirect('/driver/definition/profile');
             } else {
                 $this->session->set('error', 'Erro ao atualizar perfil');
             }
         }
 
-        $this->renderView('driver/profile', [
-            'user' => $user
+        // Convert User object to array for view
+        $userData = [
+            'id' => $user->getId(),
+            'name' => $user->getName(),
+            'email' => $user->getEmail(),
+            'phone' => $user->getPhone(),
+            'address' => $user->getAddress(),
+            'emergency_contact' => $user->getEmergencyContact(),
+            'profile_photo' => $user->getProfilePhoto(),
+            'user_type' => $user->getUserType(),
+            'routes_count' => 0, // These would need to be calculated from database
+            'passengers_count' => 0,
+            'hours_worked' => 0,
+            'punctuality' => 100
+        ];
+
+        $this->renderView('driver/definition/profile', [
+            'user' => $userData
         ]);
     }
 
