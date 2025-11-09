@@ -10,12 +10,14 @@ require_once __DIR__ . '/../repositories/ReservationRepository.php';
 require_once __DIR__ . '/../repositories/RouteRepository.php';
 require_once __DIR__ . '/../repositories/VehicleRepository.php';
 require_once __DIR__ . '/../repositories/UserRepository.php';
+require_once __DIR__ . '/../repositories/NotificationRepository.php';
 
 class DriverController extends BaseController {
     private $reservationRepo;
     private $routeRepo;
     private $vehicleRepo;
     private $userRepo;
+    private $notificationRepo;
 
     public function __construct() {
         parent::__construct();
@@ -24,6 +26,7 @@ class DriverController extends BaseController {
         $this->routeRepo = new RouteRepository();
         $this->vehicleRepo = new VehicleRepository();
         $this->userRepo = new UserRepository();
+        $this->notificationRepo = new NotificationRepository();
     }
     
     public function dashboard() {
@@ -102,7 +105,7 @@ class DriverController extends BaseController {
         }
 
         $driverId = $this->session->get('user_id');
-        $vehicles = $this->routeRepo->getDriverVehicles($driverId);
+        $vehicles = $this->vehicleRepo->getAllVehicles();
 
         $this->renderView('driver/definition/select_vehicle', [
             'vehicles' => $vehicles
@@ -196,20 +199,57 @@ class DriverController extends BaseController {
     }
 
     public function communication() {
+        $this->requireAuth();
+        
+        // Verificar se o usuário é realmente um motorista
+        if ($this->session->get('user_type') !== 'driver') {
+            $this->session->set('error', 'Acesso permitido apenas para motoristas');
+            $this->redirect('/dashboard');
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $message = $_POST['message'] ?? '';
+            $message = trim($_POST['message'] ?? '');
             $priority = $_POST['priority'] ?? 'normal';
 
             if (!empty($message)) {
-                // Aqui seria implementada a lógica para enviar mensagem para central
-                $this->session->set('success', 'Mensagem enviada para central de operações!');
-                $this->redirect('/driver/communication');
+                // Enviar notificação para todos os estudantes do motorista
+                $driverId = $this->session->get('user_id');
+                
+                error_log("Motorista $driverId tentando enviar mensagem: $message");
+                
+                $notificationsSent = $this->notificationRepo->createDriverMessageNotification(
+                    $driverId, 
+                    $message, 
+                    $priority
+                );
+
+                if ($notificationsSent > 0) {
+                    $this->session->set('success', "Mensagem enviada para $notificationsSent estudantes!");
+                    error_log("Mensagem enviada com sucesso para $notificationsSent estudantes");
+                } else {
+                    $this->session->set('error', 'Nenhum estudante encontrado para receber a mensagem. Verifique se há reservas ativas.');
+                    error_log("Nenhuma notificação foi enviada - sem estudantes encontrados");
+                }
+                
+                $this->redirect('/driver/definition/communication');
             } else {
                 $this->session->set('error', 'Digite uma mensagem válida');
             }
         }
+
+        $this->renderView('driver/definition/communication');
     }
 
+    private function updateSessionData($user) {
+        $this->session->set('user_name', $user->getName());
+        $this->session->set('user_email', $user->getEmail());
+        $this->session->set('user_phone', $user->getPhone());
+        $this->session->set('user_address', $user->getAddress());
+        $this->session->set('user_emergency_contact', $user->getEmergencyContact());
+        $this->session->set('user_profile_photo', $user->getProfilePhoto());
+    }
+
+    // E modifique a parte final do método profile():
     public function profile() {
         $userId = $this->session->get('user_id');
         $user = $this->userRepo->findById($userId);
@@ -264,6 +304,11 @@ class DriverController extends BaseController {
             }
 
             if ($this->userRepo->updateUser($userId, $userData)) {
+                // Update session data with new user information
+                $updatedUser = $this->userRepo->findById($userId);
+                if ($updatedUser) {
+                    $this->updateSessionData($updatedUser);
+                }
                 $this->session->set('success', 'Perfil atualizado com sucesso!');
                 $this->redirect('/driver/definition/profile');
             } else {

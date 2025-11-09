@@ -70,7 +70,8 @@ $router->addRoute('GET', '/driver/passengers', 'DriverController@passengersByRou
 $router->addRoute('GET', '/driver/definition/routes', 'DriverController@manageRoutes');
 $router->addRoute('POST', '/driver/definition/routes', 'DriverController@manageRoutes');
 $router->addRoute('GET', '/driver/reports/attendance-report', 'DriverController@attendanceReport');
-$router->addRoute('GET', '/driver/communication', 'DriverController@communication');
+$router->addRoute('GET', '/driver/definition/communication', 'DriverController@communication');
+$router->addRoute('POST', '/driver/definition/communication', 'DriverController@communication');
 $router->addRoute('GET', '/driver/definition/profile', 'DriverController@profile');
 $router->addRoute('POST', '/driver/definition/profile', 'DriverController@profile');
 $router->addRoute('GET', '/driver/definition/requests', 'DriverController@requests');
@@ -84,12 +85,18 @@ $router->addRoute('GET', '/driver/reports/export', 'DriverController@exportRepor
 // ==================== ROTAS DO ESTUDANTES ====================
 $router->addRoute('GET', '/student/definition/reservations', 'StudentController@reservations');
 $router->addRoute('POST', '/student/definition/reservations', 'StudentController@reservations');
-$router->addRoute('POST', '/student/definition/cancel-reservation', 'StudentController@cancelReservation');
 $router->addRoute('GET', '/student/definition/profile', 'StudentController@profile');
 $router->addRoute('POST', '/student/definition/profile', 'StudentController@profile');
 $router->addRoute('GET', '/student/card/digital-card', 'StudentController@digitalCard');
 $router->addRoute('GET', '/student/definition/return-routes', 'StudentController@returnRoutes');
-
+$router->addRoute('POST', '/student/mark-all-notifications-read', 'StudentController@markAllNotificationsAsRead');
+// Rotas para notificações
+$router->addRoute('GET', '/notifications/stream', 'NotificationStreamController@stream');
+$router->addRoute('GET', '/notifications/unread-count', 'NotificationStreamController@getUnreadCount');
+$router->addRoute('GET', '/student/notifications', 'StudentController@notifications');
+$router->addRoute('POST', '/student/notifications/mark-read', 'StudentController@markNotificationAsRead');
+$router->addRoute('POST', '/student/notifications/mark-all-read', 'StudentController@markAllNotificationsAsRead');
+$router->addRoute('POST', '/student/notifications/delete', 'StudentController@deleteNotification');
 // ==================== ROTA PADRÃO ====================
 // Associação: Chamada do método dispatch do Router para processar a requisição.
 // Justificativa: Delega o processamento da rota para a classe especializada, mantendo separação de responsabilidades.

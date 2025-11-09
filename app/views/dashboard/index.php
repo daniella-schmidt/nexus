@@ -163,6 +163,18 @@ if (!isset($_SESSION['user_id'])) {
         </div>
       </a>
 
+      <a href="/nexus/student/notifications" class="nexus-card frost rounded-2xl p-6 shadow-soft hover:shadow-glow-lg transition-all border border-white/40">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl grid place-items-center" style="background:var(--nexus-e)">
+                <i class="bi bi-bell text-white text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg text-nexus-ink">Notificações</h3>
+                <p class="text-nexus-ink/70 text-sm">Mensagens dos motoristas</p>
+            </div>
+        </div>
+    </a>
+
       <a href="/nexus/student/definition/profile" class="nexus-card frost rounded-2xl p-6 shadow-soft hover:shadow-glow-lg transition-all border border-white/40">
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 rounded-xl grid place-items-center" style="background:var(--nexus-f)">

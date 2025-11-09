@@ -21,7 +21,7 @@ class RouteRepository {
     }
 
     public function getAvailableRoutes() {
-        $sql = "SELECT * FROM routes WHERE status = 'scheduled' AND active = 1 ORDER BY departure_time ASC";
+        $sql = "SELECT * FROM routes WHERE status = 'scheduled' AND active = 1 AND route_date >= CURDATE() ORDER BY departure_time ASC";
         try {
             $stmt = $this->route->executeQuery($sql);
             return $this->route->fetchAll($stmt);

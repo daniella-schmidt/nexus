@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
+
   <script>
     tailwind.config = {
       theme: {
@@ -37,14 +37,62 @@
         }
       }
     }
+
+    function openCancelModal(reservationId) {
+      document.getElementById('cancelModal').classList.remove('hidden');
+      document.getElementById('reservationIdToCancel').value = reservationId;
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancelModal').classList.add('hidden');
+    }
+
+    async function confirmCancel() {
+      const reservationId = document.getElementById('reservationIdToCancel').value;
+      const formData = new FormData();
+      formData.append('reservation_id', reservationId);
+
+      console.log('Enviando requisição AJAX para cancelar reserva:', reservationId);
+
+      try {
+        const response = await fetch('/student/definition/cancel-reservation', {
+          method: 'POST',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          },
+          body: formData
+        });
+
+        console.log('Resposta recebida:', response.status, response.statusText);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log('Resultado JSON:', result);
+
+        if (result.success) {
+          closeCancelModal();
+          // Recarregar a página para atualizar a lista de reservas
+          location.reload();
+        } else {
+          alert('Erro ao cancelar reserva: ' + (result.message || 'Erro desconhecido'));
+        }
+      } catch (error) {
+        console.error('Erro na requisição:', error);
+        alert('Erro ao processar a solicitação: ' + error.message);
+      }
+    }
   </script>
-  
+
   <style>
     :root{
       --nexus-a:#4b687f; --nexus-b:#63a8ca; --nexus-c:#85b0d8; --nexus-d:#af91bd; --nexus-e:#966e92; --nexus-f:#7c4c68;
     }
-    .gradient-surface{ 
-      background-image: 
+    .gradient-surface{
+      background-image:
         radial-gradient(1200px 600px at 10% -10%, rgba(99,168,202,.25), transparent 60%),
         radial-gradient(900px 500px at 90% 10%, rgba(175,145,189,.22), transparent 60%),
         linear-gradient(180deg, #fbfcff 0%, #f5f7fd 60%, #eef2f7 100%);
@@ -66,7 +114,7 @@
         </div>
         <span class="text-xl font-extrabold tracking-tight" style="color:var(--nexus-a)">NEXUS</span>
       </div>
-      
+
       <div class="flex items-center gap-4">
         <a href="/nexus/dashboard" class="text-sm text-nexus-ink/70 hover:text-nexus-ink transition-colors">
           <i class="bi bi-arrow-left mr-1"></i>Voltar
@@ -78,7 +126,7 @@
   <div class="container mx-auto p-6">
     <h1 class="text-3xl font-black mb-2 text-nexus-ink">Minhas Reservas</h1>
     <p class="text-nexus-ink/70 mb-8">Gerencie suas reservas de transporte</p>
-    
+
     <!-- Formulário de Nova Reserva -->
     <div class="frost rounded-2xl p-6 shadow-soft mb-8">
       <h2 class="text-xl font-semibold mb-4 text-nexus-ink">Nova Reserva</h2>
@@ -114,7 +162,7 @@
             <?php
             $days = [
               'Segunda' => 'mon',
-              'Terça' => 'tue', 
+              'Terça' => 'tue',
               'Quarta' => 'wed',
               'Quinta' => 'thu',
               'Sexta' => 'fri',
@@ -136,23 +184,26 @@
         </div>
 
 
+
         <div class="grid md:grid-cols-2 gap-4 mb-4">
           <div>
             <label class="block text-sm font-medium mb-2 text-nexus-ink">Ponto de Embarque</label>
-            <select name="route_id" class="w-full p-3 rounded-xl border border-gray-300/60 bg-white/70 focus:outline-none focus:ring-2 focus:ring-nexus-b focus:border-transparent" required>
-              <option value="">Selecione uma rota</option>
-              <?php foreach ($routes as $route): ?>
-                <option value="<?= $route['id'] ?>"><?= htmlspecialchars($route['name']) ?> - <?= htmlspecialchars($route['departure_time']) ?></option>
-              <?php endforeach; ?>
+            <select name="pickup_point" id="pickup_point" class="w-full p-3 rounded-xl border border-gray-300/60 bg-white/70 focus:outline-none focus:ring-2 focus:ring-nexus-b focus:border-transparent" required>
+              <option value="">Selecione o ponto de embarque</option>
+              <option value="Centro">Centro</option>
+              <option value="Bairro X">Bairro X</option>
+              <option value="Bairro Y">Bairro Y</option>
+              <option value="Terminal">Terminal</option>
             </select>
           </div>
           <div>
             <label class="block text-sm font-medium mb-2 text-nexus-ink">Ponto de Desembarque</label>
-            <select name="route_id" class="w-full p-3 rounded-xl border border-gray-300/60 bg-white/70 focus:outline-none focus:ring-2 focus:ring-nexus-b focus:border-transparent" required>
-              <option value="">Selecione uma rota</option>
-              <?php foreach ($routes as $route): ?>
-                <option value="<?= $route['id'] ?>"><?= htmlspecialchars($route['name']) ?> - <?= htmlspecialchars($route['departure_time']) ?></option>
-              <?php endforeach; ?>
+            <select name="dropoff_point" id="dropoff_point" class="w-full p-3 rounded-xl border border-gray-300/60 bg-white/70 focus:outline-none focus:ring-2 focus:ring-nexus-b focus:border-transparent" required>
+              <option value="">Selecione o ponto de desembarque</option>
+              <option value="Centro">Centro</option>
+              <option value="Bairro X">Bairro X</option>
+              <option value="Bairro Y">Bairro Y</option>
+              <option value="Terminal">Terminal</option>
             </select>
           </div>
         </div>
@@ -163,7 +214,7 @@
         </div>
       </form>
     </div>
-    
+
     <!-- Lista de Reservas -->
     <div class="frost rounded-2xl p-6 shadow-soft">
       <h2 class="text-xl font-semibold mb-4 text-nexus-ink">Reservas Ativas</h2>
@@ -171,8 +222,10 @@
         <table class="w-full">
           <thead>
             <tr class="bg-nexus-a/5">
-              <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Data</th>
-              <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Rota</th>
+              <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Data Inicial/Final</th>
+              <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Faculdade</th>
+              <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Embarque/Desembarque</th>
+              <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Dias da Semana</th>
               <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Horário</th>
               <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Status</th>
               <th class="p-4 text-left text-sm font-semibold text-nexus-ink">Ações</th>
@@ -181,9 +234,35 @@
           <tbody>
             <?php foreach ($reservations as $reservation): ?>
             <tr class="border-b border-nexus-ink/10 hover:bg-nexus-b/5 transition-colors">
-              <td class="p-4"><?= date('d/m/Y', strtotime($reservation['reservation_date'])) ?></td>
-              <td class="p-4 font-medium"><?= $reservation['route_name'] ?></td>
-              <td class="p-4"><?= $reservation['schedule'] ?></td>
+              <td class="p-4">
+                <?= date('d/m/Y', strtotime($reservation['start_date'])) ?> - <?= date('d/m/Y', strtotime($reservation['end_date'])) ?>
+              </td>
+              <td class="p-4 font-medium"><?= $reservation['collage'] ?></td>
+              <td class="p-4">
+                <?= $reservation['pickup_point'] ?> → <?= $reservation['dropoff_point'] ?>
+              </td>
+              <td class="p-4">
+                <?php
+                $daysMap = [
+                  'mon' => 'Seg',
+                  'tue' => 'Ter',
+                  'wed' => 'Qua',
+                  'thu' => 'Qui',
+                  'fri' => 'Sex',
+                  'sat' => 'Sáb',
+                  'sun' => 'Dom'
+                ];
+                $days = explode(',', $reservation['days_of_week']);
+                $formattedDays = [];
+                foreach ($days as $day) {
+                  if (isset($daysMap[$day])) {
+                    $formattedDays[] = $daysMap[$day];
+                  }
+                }
+                echo implode(', ', $formattedDays);
+                ?>
+              </td>
+              <td class="p-4"><?= $reservation['departure_time'] ?></td>
               <td class="p-4">
                 <span class="px-3 py-1 rounded-full text-sm font-medium
                   <?= $reservation['status'] == 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' ?>">
@@ -192,12 +271,9 @@
               </td>
               <td class="p-4">
                 <?php if ($reservation['status'] == 'active'): ?>
-                <form method="POST" action="/student/definition/cancel-reservation" class="inline">
-                  <input type="hidden" name="reservation_id" value="<?= $reservation['id'] ?>">
-                  <button type="submit" class="text-nexus-f hover:text-nexus-e transition-colors text-sm font-medium">
-                    Cancelar
-                  </button>
-                </form>
+                <button onclick="openCancelModal(<?= $reservation['id'] ?>)" class="text-nexus-f hover:text-nexus-e transition-colors text-sm font-medium">
+                  Cancelar
+                </button>
                 <?php endif; ?>
               </td>
             </tr>
@@ -218,6 +294,37 @@
     </div>
   </div>
 
+  <!-- Modal de Cancelamento -->
+  <div id="cancelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-soft">
+          <div class="text-center">
+              <div class="w-16 h-16 mx-auto rounded-2xl grid place-items-center mb-4 bg-red-100">
+                  <i class="bi bi-exclamation-triangle text-red-600 text-2xl"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-nexus-ink mb-2">Confirmar Cancelamento</h3>
+              <p class="text-nexus-ink/70 mb-6">Tem certeza que deseja cancelar esta reserva? Esta ação não pode ser desfeita.</p>
+              
+              <!-- FORMULÁRIO DIRETO - sem AJAX -->
+              <form method="POST" action="/student/definition/reservations" class="flex gap-3">
+                  <input type="hidden" name="reservation_id" id="reservationIdToCancel" value="">
+                  <input type="hidden" name="action" value="cancel">
+                  
+                  <button type="button" onclick="closeCancelModal()" class="flex-1 px-4 py-2 rounded-xl border border-gray-300 text-nexus-ink hover:bg-gray-50 transition-colors">
+                      Voltar
+                  </button>
+                  <button type="submit" class="flex-1 px-4 py-2 rounded-xl text-white font-medium" style="background:var(--nexus-f)">
+                      Confirmar Cancelamento
+                  </button>
+              </form>
+          </div>
+      </div>
+  </div>
+
+  <!-- Form oculto para cancelamento -->
+  <form id="cancelForm" method="POST" action="/student/definition/cancel-reservation" style="display: none;">
+    <input type="hidden" id="reservationIdToCancel" name="reservation_id" value="">
+  </form>
+
   <!-- Footer -->
   <footer class="bg-white/80 border-t border-white/60 py-8 mt-12">
     <div class="container mx-auto px-4">
@@ -237,70 +344,14 @@
     </div>
   </footer>
 <script>
-  // Dados das rotas (serão passados do PHP)
-const routesData = <?php echo json_encode($routes); ?>;
-
-function updatePickupPoints() {
-    const routeSelect = document.querySelector('select[name="route_id"]');
-    const pickupSelect = document.querySelector('select[name="pickup_point"]');
-    const dropoffSelect = document.querySelector('select[name="dropoff_point"]');
-
-    const selectedRouteId = routeSelect.value;
-
-    // Limpar opções atuais
-    pickupSelect.innerHTML = '<option value="">Selecione o ponto de embarque</option>';
-    dropoffSelect.innerHTML = '<option value="">Selecione o ponto de desembarque</option>';
-
-    if (selectedRouteId) {
-        const selectedRoute = routesData.find(route => route.id == selectedRouteId);
-        if (selectedRoute && selectedRoute.pickup_points) {
-            const pickupPoints = selectedRoute.pickup_points.split(',').map(point => point.trim());
-
-            // Adicionar pontos de embarque
-            pickupPoints.forEach(point => {
-                const option = document.createElement('option');
-                option.value = point;
-                option.textContent = point;
-                pickupSelect.appendChild(option);
-            });
-
-            // Adicionar pontos de desembarque (pode ser diferente se necessário)
-            pickupPoints.forEach(point => {
-                const option = document.createElement('option');
-                option.value = point;
-                option.textContent = point;
-                dropoffSelect.appendChild(option);
-            });
-        } else {
-            // Pontos padrão se não houver específicos
-            const defaultPoints = ['Unoesc', 'Centro', 'Terminal', 'São Sebastião'];
-            defaultPoints.forEach(point => {
-                const option1 = document.createElement('option');
-                option1.value = point;
-                option1.textContent = point;
-                pickupSelect.appendChild(option1);
-
-                const option2 = document.createElement('option');
-                option2.value = point;
-                option2.textContent = point;
-                dropoffSelect.appendChild(option2);
-            });
-        }
-    }
+function openCancelModal(reservationId) {
+    document.getElementById('cancelModal').classList.remove('hidden');
+    document.getElementById('reservationIdToCancel').value = reservationId;
 }
 
-// Adicionar event listener quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', function() {
-    const routeSelect = document.querySelector('select[name="route_id"]');
-    if (routeSelect) {
-        routeSelect.addEventListener('change', updatePickupPoints);
-        
-        // Atualizar imediatamente se já houver um valor selecionado
-        if (routeSelect.value) {
-            updatePickupPoints();
-        }
-    }
-});
+function closeCancelModal() {
+    document.getElementById('cancelModal').classList.add('hidden');
+}
 </script>
 </body>
 </html>

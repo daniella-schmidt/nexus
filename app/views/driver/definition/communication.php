@@ -24,7 +24,7 @@
                             required
                             rows="4"
                             class="w-full px-4 py-3 rounded-xl border border-gray-300/60 bg-white/70 focus:outline-none focus:ring-2 focus:ring-nexus-b focus:border-transparent transition-all resize-none"
-                            placeholder="Digite sua mensagem para a central de operações..."
+                            placeholder="Digite sua mensagem para todos os estudantes..."
                         ></textarea>
                     </div>
 
@@ -44,7 +44,7 @@
                     </div>
 
                     <button type="submit" class="w-full bg-nexus-b text-white py-3 rounded-lg hover:bg-nexus-a transition-colors">
-                        <i class="bi bi-send mr-2"></i>Enviar Mensagem
+                        <i class="bi bi-send mr-2"></i>Enviar Mensagem para Todos os Estudantes
                     </button>
                 </form>
             </div>

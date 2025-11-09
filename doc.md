@@ -34,3 +34,5 @@
     - Classe abstrata Model define operações comuns
     - Interfaces implícitas através de métodos comuns
     - Separação entre interface e implementação
+    # 9. Interfaces
+    # 10. PDO

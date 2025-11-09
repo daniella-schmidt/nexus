@@ -8,12 +8,16 @@
 // Encapsulamento: Propriedades privadas protegem a instância de Database.
 // Justificativa: Impede acesso direto à conexão de banco de dados.
 
+// Interfaces: UserRepository implementa RepositoryInterface para padronização.
+// Justificativa: Garante que todos os repositórios tenham métodos CRUD consistentes.
+
 // Visibilidade de Propriedades e Métodos: Métodos públicos para operações externas.
 // Justificativa: Controla o acesso às funcionalidades do repositório.
 
 require_once __DIR__ . '/../models/User.php';
+require_once 'RepositoryInterface.php';
 
-class UserRepository {
+class UserRepository implements RepositoryInterface {
     private $db;
     
     public function __construct() {
@@ -133,6 +137,27 @@ class UserRepository {
             error_log("Erro ao atualizar usuário: " . $e->getMessage());
             return false;
         }
+    }
+
+    // Implementação dos métodos da interface RepositoryInterface
+    public function findAll() {
+        $sql = "SELECT * FROM users WHERE active = 1 ORDER BY name";
+        $stmt = $this->db->executeQuery($sql);
+        return $this->db->fetchAll($stmt);
+    }
+
+    public function create($data) {
+        return $this->createUser($data);
+    }
+
+    public function update($id, $data) {
+        return $this->updateUser($id, $data);
+    }
+
+    public function delete($id) {
+        $sql = "UPDATE users SET active = 0 WHERE id = ?";
+        $stmt = $this->db->executeQuery($sql, [$id]);
+        return $stmt->rowCount() > 0;
     }
 }
 ?>

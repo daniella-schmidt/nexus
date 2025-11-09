@@ -9,52 +9,19 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Profile Info -->
-            <div class="frost rounded-xl p-6">
-                <div class="text-center mb-6">
-                    <div class="relative w-24 h-24 mx-auto mb-4">
-                        <?php if (!empty($user['profile_photo']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $user['profile_photo'])): ?>
-                            <img src="<?php echo htmlspecialchars($user['profile_photo']); ?>" 
-                                 alt="Foto de perfil" 
-                                 class="w-full h-full rounded-2xl object-cover border-2 border-nexus-b/30">
-                        <?php else: ?>
-                            <div class="w-full h-full rounded-2xl bg-nexus-b/10 flex items-center justify-center border-2 border-dashed border-nexus-b/30">
-                                <i class="bi bi-person text-4xl text-nexus-b"></i>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <h3 class="text-xl font-semibold text-nexus-ink"><?php echo htmlspecialchars($user['name'] ?? 'Motorista'); ?></h3>
-                    <p class="text-nexus-ink/70">Motorista</p>
-                </div>
-
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-nexus-ink/70">Email:</span>
-                        <span class="text-nexus-ink"><?php echo htmlspecialchars($user['email'] ?? 'N/A'); ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-nexus-ink/70">Telefone:</span>
-                        <span class="text-nexus-ink"><?php echo htmlspecialchars($user['phone'] ?? 'N/A'); ?></span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-nexus-ink/70">Status:</span>
-                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Ativo</span>
-                    </div>
-                </div>
-            </div>
 
             <!-- Edit Profile Form -->
-            <div class="lg:col-span-2 frost rounded-xl p-6">
+            <div class="lg:col-span-10 frost rounded-xl p-6">
                 <h2 class="text-xl font-semibold text-nexus-ink mb-6">Editar Perfil</h2>
 
                 <form method="POST" enctype="multipart/form-data" class="space-y-6">
                     <!-- Foto do Perfil -->
                     <div class="text-center">
                         <div class="relative w-24 h-24 mx-auto mb-4">
-                            <?php if (!empty($user['profile_photo']) && file_exists($_SERVER['DOCUMENT_ROOT'] . $user['profile_photo'])): ?>
-                                <img src="<?php echo htmlspecialchars($user['profile_photo']); ?>" 
-                                     alt="Foto de perfil" 
-                                     class="w-full h-full rounded-2xl object-cover border-2 border-nexus-b/30">
+                            <?php if (!empty($user['profile_photo']) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/nexus/public' . $user['profile_photo'])): ?>
+                                <img src="<?php echo '/nexus/public' . htmlspecialchars($user['profile_photo']); ?>"
+                                    alt="Foto de perfil"
+                                    class="w-full h-full rounded-2xl object-cover border-2 border-nexus-b/30">
                             <?php else: ?>
                                 <div class="w-full h-full rounded-2xl bg-nexus-b/10 flex items-center justify-center border-2 border-dashed border-nexus-b/30">
                                     <i class="bi bi-person text-4xl text-nexus-b"></i>
@@ -184,36 +151,8 @@
                 </form>
             </div>
         </div>
-
-        <!-- Account Stats -->
-        <div class="mt-8 frost rounded-xl p-6">
-            <h2 class="text-xl font-semibold text-nexus-ink mb-6">Estatísticas da Conta</h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-nexus-b mb-2"><?php echo $user['routes_count'] ?? '0'; ?></div>
-                    <p class="text-nexus-ink/70">Rotas Realizadas</p>
-                </div>
-
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-nexus-c mb-2"><?php echo $user['passengers_count'] ?? '0'; ?></div>
-                    <p class="text-nexus-ink/70">Passageiros Transportados</p>
-                </div>
-
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-nexus-d mb-2"><?php echo $user['hours_worked'] ?? '0'; ?></div>
-                    <p class="text-nexus-ink/70">Horas Trabalhadas</p>
-                </div>
-
-                <div class="text-center">
-                    <div class="text-3xl font-bold text-nexus-e mb-2"><?php echo $user['punctuality'] ?? '100'; ?>%</div>
-                    <p class="text-nexus-ink/70">Pontualidade</p>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const profilePhotoInput = document.getElementById('profile_photo');
@@ -241,25 +180,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             previewImage(this);
         });
-    }
-
-    // Password confirmation validation
-    const password = document.getElementById('password');
-    const confirmPassword = document.getElementById('confirm_password');
-
-    function validatePassword() {
-        if (password.value !== confirmPassword.value) {
-            confirmPassword.style.borderColor = '#ef4444';
-            confirmPassword.style.backgroundColor = '#fef2f2';
-        } else {
-            confirmPassword.style.borderColor = '#10b981';
-            confirmPassword.style.backgroundColor = '#f0fdf4';
-        }
-    }
-
-    if (password && confirmPassword) {
-        password.addEventListener('input', validatePassword);
-        confirmPassword.addEventListener('input', validatePassword);
     }
 });
 

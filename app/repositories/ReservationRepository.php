@@ -26,20 +26,20 @@ class ReservationRepository {
             // Gerar código de confirmação único
             $confirmationCode = strtoupper(substr(md5(uniqid()), 0, 8));
 
-            $sql = "INSERT INTO reservations (user_id, route_id, reservation_date, pickup_point, dropoff_point, start_date, end_date, days_of_week, collage, confirmation_code, status, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', NOW())";
+            $sql = "INSERT INTO reservations (user_id, route_id, seat_id, reservation_date, status, qr_code, created_at, confirmation_code, confirmed_at, cancellation_reason, check_in_time, updated_at, pickup_point, dropoff_point, start_date, end_date, days_of_week, collage)
+                VALUES (?, ?, NULL, ?, 'active', NULL, NOW(), ?, NULL, NULL, NULL, NOW(), ?, ?, ?, ?, ?, ?)";
 
             $stmt = $this->db->executeQuery($sql, [
-                $userId, 
-                $routeId, 
-                $date, 
-                $pickupPoint, 
-                $dropoffPoint, 
-                $startDate, 
-                $endDate, 
+                $userId,
+                $routeId,
+                $date,
+                $confirmationCode,
+                $pickupPoint,
+                $dropoffPoint,
+                $startDate,
+                $endDate,
                 $daysOfWeek,
-                $faculdade,
-                $confirmationCode
+                $faculdade
             ]);
             
             return $stmt->rowCount() > 0;
@@ -59,13 +59,21 @@ class ReservationRepository {
     }
     
     public function cancelReservation($reservationId, $userId) {
-        $sql = "UPDATE reservations SET status = 'cancelled', updated_at = NOW() 
-                WHERE id = ? AND user_id = ?";
-        
-        $stmt = $this->db->executeQuery($sql, [$reservationId, $userId]);
-        return $stmt->rowCount() > 0;
+        try {
+            $sql = "UPDATE reservations SET status = 'cancelled', updated_at = NOW() 
+                    WHERE id = ? AND user_id = ? AND status = 'active'";
+            
+            $stmt = $this->db->executeQuery($sql, [$reservationId, $userId]);
+            $success = $stmt->rowCount() > 0;
+            
+            error_log("Cancelamento no BD - Reserva: $reservationId, User: $userId, Sucesso: " . ($success ? 'Sim' : 'Não'));
+            
+            return $success;
+        } catch (Exception $e) {
+            error_log("Erro ao cancelar reserva: " . $e->getMessage());
+            return false;
+        }
     }
-
     public function getDriverReservations($driverId) {
         $sql = "SELECT r.*, u.name as student_name, u.matricula, rt.name as route_name, rt.departure_time
                 FROM reservations r
