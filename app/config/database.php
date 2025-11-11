@@ -1,8 +1,8 @@
 <?php
-// 3.1 Encapsulamento: Propriedades privadas estáticas protegem dados de configuração.
+// Encapsulamento: Propriedades privadas estáticas protegem dados de configuração.
 // Justificativa: Impede acesso direto às credenciais de banco de dados.
 
-// 2.3 Visibilidade de Propriedades e Métodos: Propriedades privadas e método público.
+// Visibilidade de Propriedades e Métodos: Propriedades privadas e método público.
 // Justificativa: Propriedades privadas garantem que as configurações sejam manipuladas apenas pelos métodos da própria classe.
 
 class DatabaseConfig {

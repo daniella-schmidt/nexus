@@ -44,7 +44,6 @@ if (!isset($_SESSION['user_id'])) {
                                             <p class="text-nexus-ink/80 mb-3"><?php echo htmlspecialchars($notification['message']); ?></p>
                                             <div class="flex items-center gap-4 text-sm text-nexus-ink/60">
                                                 <span><i class="bi bi-clock mr-1"></i><?php echo date('d/m/Y H:i', strtotime($notification['created_at'])); ?></span>
-                                                <span class="capitalize"><?php echo $notification['priority']; ?></span>
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-2 ml-4">

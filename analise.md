@@ -6,11 +6,11 @@
         - Propriedades privadas para encapsulamento de dados
         - Métodos públicos para interfaces externas
         - Métodos protegidos para herança
-    ## 2. Encapsulamento
-        - Classe Session: Encapsula operações de sessão
-        - Classe Database: Protege conexão com banco
-        - Classe User: Propriedades privadas com getters/setters
-        - Classe Router: Propriedade privada $routes
+        ## 2. Encapsulamento
+            - Classe Session: Encapsula operações de sessão
+            - Classe Database: Protege conexão com banco
+            - Classe User: Propriedades privadas com getters/setters
+            - Classe Router: Propriedade privada $routes
     ## 3. Herança
         - User, Route, Vehicle herdam de Database
         - Todos os Controllers herdam de BaseController

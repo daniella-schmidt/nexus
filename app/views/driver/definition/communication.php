@@ -8,7 +8,7 @@
             <p class="text-nexus-ink/70">Envie mensagens e receba atualizações da central de operações</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="">
             <!-- Send Message -->
             <div class="frost rounded-xl p-6">
                 <h2 class="text-xl font-semibold text-nexus-ink mb-6">Enviar Mensagem</h2>
@@ -47,38 +47,6 @@
                         <i class="bi bi-send mr-2"></i>Enviar Mensagem para Todos os Estudantes
                     </button>
                 </form>
-            </div>
-
-            <!-- Message History -->
-            <div class="frost rounded-xl p-6">
-                <h2 class="text-xl font-semibold text-nexus-ink mb-6">Mensagens Recentes</h2>
-
-                <div class="space-y-4 max-h-96 overflow-y-auto">
-                    <?php if (!empty($messages)): ?>
-                        <?php foreach ($messages as $message): ?>
-                            <div class="border border-gray-200 rounded-lg p-4 <?php echo $message['priority'] === 'high' ? 'border-l-4 border-l-red-500' : ''; ?>">
-                                <div class="flex items-start justify-between mb-2">
-                                    <div class="flex items-center">
-                                        <i class="bi bi-person-circle text-nexus-b text-lg mr-2"></i>
-                                        <span class="font-medium text-nexus-ink">Central de Operações</span>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        <?php if ($message['priority'] === 'high'): ?>
-                                            <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Alta Prioridade</span>
-                                        <?php endif; ?>
-                                        <span class="text-xs text-nexus-ink/70"><?php echo date('d/m H:i', strtotime($message['timestamp'])); ?></span>
-                                    </div>
-                                </div>
-                                <p class="text-nexus-ink"><?php echo htmlspecialchars($message['message']); ?></p>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="text-center py-8">
-                            <i class="bi bi-chat-square text-4xl text-nexus-ink/30 mb-4"></i>
-                            <p class="text-nexus-ink/70">Nenhuma mensagem recente</p>
-                        </div>
-                    <?php endif; ?>
-                </div>
             </div>
         </div>
 
