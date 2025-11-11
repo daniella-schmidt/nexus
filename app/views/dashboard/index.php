@@ -492,20 +492,6 @@
                     </h1>
                     <p class="text-nexus-ink/70 text-lg mb-4">Bem-vindo ao seu portal de transporte universitário</p>
                     <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 bg-nexus-b/10 text-nexus-b rounded-full text-sm font-medium">
-                            <?php
-                                if ($type === 'student') {
-                                    $userTypeLabel = 'Estudante';
-                                } elseif ($type === 'driver') {
-                                    $userTypeLabel = 'Motorista';
-                                } elseif ($type === 'admin') {
-                                    $userTypeLabel = 'Administrador';
-                                } else {
-                                    $userTypeLabel = 'Usuário';
-                                }
-                                echo $userTypeLabel;
-                            ?>
-                        </span>
                         <?php if ($matricula): ?>
                             <span class="px-3 py-1 bg-nexus-d/10 text-nexus-d rounded-full text-sm font-medium">
                                 Matrícula: <?php echo htmlspecialchars($matricula); ?>
