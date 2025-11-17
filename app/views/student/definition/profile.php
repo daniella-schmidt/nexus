@@ -157,34 +157,6 @@
           </div>
         </form>
       </div>
-
-      <!-- Histórico de Uso -->
-      <div class="frost rounded-2xl p-6 shadow-soft mt-8">
-        <h2 class="text-xl font-semibold mb-4 text-nexus-ink">Histórico de Uso</h2>
-        <div class="space-y-4">
-          <div class="flex items-center justify-between p-4 bg-white/50 rounded-lg">
-            <div>
-              <p class="font-medium text-nexus-ink">Total de Reservas</p>
-              <p class="text-sm text-nexus-ink/70">Este mês</p>
-            </div>
-            <div class="text-2xl font-bold text-nexus-b">12</div>
-          </div>
-          <div class="flex items-center justify-between p-4 bg-white/50 rounded-lg">
-            <div>
-              <p class="font-medium text-nexus-ink">Presença Confirmada</p>
-              <p class="text-sm text-nexus-ink/70">Este mês</p>
-            </div>
-            <div class="text-2xl font-bold text-green-600">10</div>
-          </div>
-          <div class="flex items-center justify-between p-4 bg-white/50 rounded-lg">
-            <div>
-              <p class="font-medium text-nexus-ink">Pontualidade</p>
-              <p class="text-sm text-nexus-ink/70">Média mensal</p>
-            </div>
-            <div class="text-2xl font-bold text-nexus-d">95%</div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 

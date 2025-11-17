@@ -197,10 +197,6 @@
                            class="hover:opacity-80 transition-all font-medium text-nexus-ink hover:text-nexus-b">
                             Rotas
                         </a>
-                        <a href="/nexus/manager/reports" 
-                           class="hover:opacity-80 transition-all font-medium text-nexus-ink hover:text-nexus-b">
-                            Relatórios
-                        </a>
                     <?php elseif ($_SESSION['user_type'] === 'driver'): ?>
                         <a href="/nexus/driver/scan/checkin" 
                            class="hover:opacity-80 transition-all font-medium text-nexus-ink hover:text-nexus-b">
@@ -328,10 +324,6 @@
                             <a href="/nexus/manager/routes" 
                                class="block py-3 px-4 rounded-xl hover:bg-nexus-b/10 transition-all font-medium text-nexus-ink">
                                 <i class="bi bi-signpost mr-3"></i>Rotas
-                            </a>
-                            <a href="/nexus/manager/reports" 
-                               class="block py-3 px-4 rounded-xl hover:bg-nexus-b/10 transition-all font-medium text-nexus-ink">
-                                <i class="bi bi-graph-up mr-3"></i>Relatórios
                             </a>
                         <?php elseif ($_SESSION['user_type'] === 'driver'): ?>
                             <a href="/nexus/driver/scan/checkin" 
