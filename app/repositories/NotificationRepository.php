@@ -1,9 +1,13 @@
 <?php
 require_once __DIR__ . '/../models/Database.php';
 
+// Encapsulamento: Propriedade privada $db para proteger acesso ao banco de dados.
+// Justificativa: Evita exposição direta da conexão, centralizando operações através de métodos públicos.
 class NotificationRepository {
     private $db;
 
+    // Agregação: Instancia Database para operações de banco.
+    // Justificativa: Permite reutilização da classe Database sem herança, facilitando manutenção.
     public function __construct() {
         $this->db = new Database();
     }

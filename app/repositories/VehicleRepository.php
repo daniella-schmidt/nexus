@@ -1,14 +1,14 @@
 <?php
-// 4.2 Agregação: VehicleRepository agrega Database para operações de banco de dados.
+// Agregação: VehicleRepository agrega Database para operações de banco de dados.
 // Justificativa: Utiliza Database como parte de sua implementação para acesso a dados de veículos.
 
-// 4.1 Associação: VehicleRepository tem associação com RouteRepository para validações.
+// Associação: VehicleRepository tem associação com RouteRepository para validações.
 // Justificativa: Utiliza RouteRepository para verificar se veículo está em uso, mas pode existir independentemente.
 
-// 3.1 Encapsulamento: Propriedades privadas protegem a instância de Database.
+// Encapsulamento: Propriedades privadas protegem a instância de Database.
 // Justificativa: Impede acesso direto à conexão de banco de dados.
 
-// 2.3 Visibilidade de Propriedades e Métodos: Métodos públicos para operações externas.
+// Visibilidade de Propriedades e Métodos: Métodos públicos para operações externas.
 // Justificativa: Controla o acesso às funcionalidades do repositório.
 
 require_once __DIR__ . '/../models/User.php';
